@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878485243437",
+    "project_id": "familesfriends",
+    "storage_bucket": "familesfriends.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878485243437:android:6019dca67598af20f65aa4",
+        "android_client_info": {
+          "package_name": "com.chetan.ff"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALyw4tmaz5WjembICjB1yHP-eYE94YrOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
