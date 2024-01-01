@@ -5,6 +5,8 @@ open class Destination(open val route: String) {
 
         object DashboardDestination : Destination("dashboard-screen")
 
+        object SignInDestination : Destination("sign-in-screen")
+
 
         //music player
         object MusicPlayerDestination : Destination("music-player-screen")

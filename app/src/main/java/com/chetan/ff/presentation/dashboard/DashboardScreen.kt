@@ -23,13 +23,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +51,7 @@ import com.chetan.ff.presentation.dashboard.home.HomeScreen
 import com.chetan.ff.presentation.dashboard.home.HomeViewModel
 import com.chetan.ff.presentation.dashboard.library.LibraryScreen
 import com.chetan.ff.utils.BottomNavigate.bottomNavigate
+import kotlinx.coroutines.delay
 
 data class InnerPage(
     val route: String,
@@ -57,9 +62,19 @@ data class InnerPage(
 )
 
 @Composable
-fun DashboardScreen(nav: NavHostController) {
+fun DashboardScreen(nav: NavHostController, onBack: () -> Unit) {
     val bottomNavController = rememberNavController()
     val scope = rememberCoroutineScope()
+
+    var backPressCount by remember {
+        mutableIntStateOf(0)
+    }
+    LaunchedEffect(key1 = backPressCount, block = {
+        if (backPressCount == 1) {
+            delay(2000)
+            backPressCount = 0
+        }
+    })
     val items: List<InnerPage> = remember {
         listOf(
             InnerPage("home", R.string.home, Icons.Default.Home),
@@ -69,8 +84,7 @@ fun DashboardScreen(nav: NavHostController) {
                 R.string.musicplayer,
                 Icons.Default.PlayCircleOutline,
                 isBadge = true
-            ),
-            InnerPage("history", R.string.history, Icons.Default.Notifications)
+            )
         )
     }
     Scaffold(

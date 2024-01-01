@@ -1,4 +1,4 @@
-package com.chetan.ff.data.model
+package com.chetan.ff.data
 
 import java.lang.Exception
 

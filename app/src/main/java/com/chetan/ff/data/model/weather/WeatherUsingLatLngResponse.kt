@@ -6,7 +6,7 @@ data class WeatherUsingLatLngResponse(
     @SerializedName("base")
     val base: String = "",
     @SerializedName("clouds")
-    val clouds: Clouds? ,
+    val clouds: Clouds?,
     @SerializedName("cod")
     val cod: Int = 0,
     @SerializedName("coord")

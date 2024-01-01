@@ -10,13 +10,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.chetan.ff.presentation.dashboard.DashboardScreen
+import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
 import com.chetan.ff.ui.theme.FFTheme
+import com.chetan.orderdelivery.data.local.Preference
+import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var preference: Preference
+    private val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -39,7 +52,14 @@ class MainActivity : ComponentActivity() {
 
                 ) {
                     val navController = rememberNavController()
-                    AppNavHost(navController = navController)
+                    AppNavHost(navController = navController,
+                        onBack = {
+                            println("I am called")
+                            finish()
+                        },
+                        googleAuthUiClient,
+                        lifecycleScope,
+                        applicationContext)
                 }
             }
         }
