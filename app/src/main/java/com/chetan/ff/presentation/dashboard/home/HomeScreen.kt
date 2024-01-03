@@ -144,12 +144,6 @@ fun HomeScreen(
             .padding(horizontal = 10.dp)
             .animateContentSize(),
     ) {
-        val listEg = listOf(
-            "https://m.media-amazon.com/images/I/61w8iMIL8YL._AC_UF894,1000_QL80_.jpg",
-            "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Iron_Man_%28circa_2018%29.png/220px-Iron_Man_%28circa_2018%29.png",
-            "https://upload.wikimedia.org/wikipedia/en/4/4a/Iron_Man_Mark_III_armor_from_Iron_Man_%282008_film%29.jpg",
-            "https://static.independent.co.uk/s3fs-public/thumbnails/image/2008/04/30/21/26206.jpg"
-        )
         val pagerState = rememberPagerState {
             state.ffLocations.size
         }
@@ -192,7 +186,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape),
-                    model = "https://scontent-lhr6-2.xx.fbcdn.net/v/t39.30808-1/343569459_1275463096718723_7844695765570199408_n.jpg?stp=c15.0.60.60a_cp0_dst-jpg_p60x60&_nc_cat=104&ccb=1-7&_nc_sid=5740b7&_nc_ohc=Dz2VvImVvEMAX8_1NXQ&_nc_ht=scontent-lhr6-2.xx&oh=00_AfCzqoIeMwXi3huse57vMTBTbQSquEm-ddxrT0GXMSC0KQ&oe=6593372A",
+                    model = state.myProfile,
                     contentDescription = "profile",
                     contentScale = ContentScale.Crop,
                 )
@@ -339,7 +333,11 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.End
                     ) {
                         IconButton(onClick = {
-                            navController.navigate(Destination.Screen.CommentDestination.route)
+                            navController.navigate(
+                                Destination.Screen.CommentDestination.route.replace(
+                                    "{img_id}", item.time + "@" + item.userId
+                                )
+                            )
                         }) {
                             Icon(
                                 modifier = Modifier.size(50.dp),
@@ -348,21 +346,22 @@ fun HomeScreen(
                                 contentDescription = ""
                             )
                         }
-
-                        listOf("CK", "RK", "CK").forEach {
+                        if (item.cmtUserProfile.isNotBlank() && item.cmtUserProfile != state.myProfile){
                             Card(
                                 modifier = Modifier,
+                                shape = CircleShape,
                                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
                                 elevation = CardDefaults.cardElevation(10.dp)
                             ) {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier.padding(3.dp),
-                                    style = TextStyle(fontWeight = FontWeight.W900)
-                                )
+                                AsyncImage(
+                                    modifier = Modifier.size(40.dp),
+                                    model = item.cmtUserProfile,
+                                    contentDescription = "")
                             }
-                            Spacer(modifier = Modifier.height(3.dp))
                         }
+
+                        Spacer(modifier = Modifier.height(3.dp))
+
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))

@@ -6,13 +6,11 @@ import com.chetan.ff.R
 import com.chetan.ff.data.Resource
 import com.chetan.ff.data.model.ImageStorageDetails
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
-import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
-import com.chetan.ff.data.repositoryImpl.WeatherRepositoryImpl
 import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
-import com.chetan.ff.presentation.dashboard.home.HomeEvent
 import com.chetan.ff.presentation.dialogs.Message
 import com.chetan.orderdelivery.data.local.Preference
+import com.google.type.DateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,9 +58,9 @@ class DashboardViewModel @Inject constructor(
                             is Resource.Success -> {
                                 val setStory = firestoreUseCases.setStories(
                                     data = StoriesDetailRequestResponse(
-                                        imageId = preference.tableName?:"test",
+                                        userId = preference.tableName?:"test",
                                         imageUrl = requestUrl.data.second,
-                                        time = LocalDateTime.now().toString(),
+                                        time = System.currentTimeMillis().toString(),
                                         group = "families"
                                     )
                                 )

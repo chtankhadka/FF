@@ -20,5 +20,9 @@ interface FirestoreRepository{
         data: StoriesDetailRequestResponse
     ): Resource<Boolean>
 
+    suspend fun updateCommentedUserInStories(
+        data: StoriesDetailRequestResponse
+    ): Resource<Boolean>
+
 
 }

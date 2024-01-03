@@ -1,13 +1,20 @@
 package com.chetan.ff.presentation.dashboard.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.CommentRequestResponse
 import com.chetan.ff.data.model.ImageStorageDetails
+import com.chetan.ff.data.model.RealtimeModelResponse
+import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.data.repositoryImpl.WeatherRepositoryImpl
 import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
+import com.chetan.ff.domain.use_cases.realtime.RealtimeUseCases
 import com.chetan.orderdelivery.data.local.Preference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +28,17 @@ class HomeViewModel @Inject constructor(
     private val weatherRepository: WeatherRepositoryImpl,
     private val firestoreUseCases: FirestoreUseCases,
     private val fdbUseCases: FDBUseCases,
+    private val realtimeUseCases: RealtimeUseCases,
     private val preference: Preference
 ) : ViewModel(){
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state
     init {
+        _state.update {
+            it.copy(
+                myProfile = preference.gmailProfile?:""
+            )
+        }
         getStatus()
         getStories()
 

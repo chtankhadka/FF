@@ -101,13 +101,14 @@ fun AppNavHost(
            )
        }
        composable(Destination.Screen.CommentDestination.route){
+           val img_id = it.arguments?.getString("img_id")!!
            val viewModel = hiltViewModel<CommentViewModel>()
            val state by viewModel.state.collectAsStateWithLifecycle()
            CommentScreen(
                nav = navController,
-               onBack = onBack,
                state = state,
-               onEvent = viewModel.onEvent
+               onEvent = viewModel.onEvent,
+               id = img_id.split("@")
 
            )
        }

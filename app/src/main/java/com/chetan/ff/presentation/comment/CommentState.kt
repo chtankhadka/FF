@@ -1,29 +1,13 @@
 package com.chetan.ff.presentation.comment
 
-import com.chetan.ff.data.model.CommentRequestResponse
+import com.chetan.ff.data.model.RealtimeModelResponse
 
 data class CommentState(
     val userName: String = "",
-
-    val cmtList: List<CommentRequestResponse> = listOf(
-        CommentRequestResponse(
-            msgId = "kkjk",
-            cmt = "kkkj;"
-        ),
-        CommentRequestResponse(
-            msgId = "kkjk",
-            cmt = "kkkj;"
-        ),
-        CommentRequestResponse(
-            msgId = "kkjk",
-            cmt = "kkkj;"
-        ),
-        CommentRequestResponse(
-            msgId = "kkjk",
-            cmt = "kkkj;"
-        )
-    ),
+    val tableName: String = "",
+    val cmtList: List<RealtimeModelResponse> = emptyList(),
     val userMsg: String = "",
-
-)
+    val imgId: String = "",
+    val newMsgSent : Boolean = false
+    )
 

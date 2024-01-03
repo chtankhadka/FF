@@ -81,7 +81,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             firestore.collection("ff")
                 .document(data.group)
                 .collection("stories")
-                .document(data.imageId)
+                .document(data.userId)
                 .set(data)
                 .addOnSuccessListener {
                     status = true
@@ -94,4 +94,21 @@ class FirestoreRepositoryImpl @Inject constructor(
             Resource.Failure(e)
         }
     }
+
+    override suspend fun updateCommentedUserInStories(data: StoriesDetailRequestResponse): Resource<Boolean> {
+        return try {
+            firestore.collection("ff")
+                .document(data.group)
+                .collection("stories")
+                .document(data.userId)
+                .update("cmtUserProfile", data.cmtUserProfile)
+                .await()
+            Resource.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+
 }

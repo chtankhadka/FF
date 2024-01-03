@@ -4,5 +4,6 @@ data class FirestoreUseCases(
     val updateStatus: UpdateStatus,
     val getStatus: GetStatus,
     val getStories: GetStories,
-    val setStories: SetStories
+    val setStories: SetStories,
+    val updateCommentedUserInStories: UpdateCommentedUserInStories
 )

@@ -2,8 +2,11 @@ package com.chetan.ff.presentation.comment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chetan.ff.data.Resource
 import com.chetan.ff.data.model.CommentRequestResponse
+import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
+import com.chetan.ff.domain.use_cases.realtime.RealtimeUseCases
 import com.chetan.ff.utils.MyDate
 import com.chetan.orderdelivery.data.local.Preference
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommentViewModel @Inject constructor(
     private val firestoreUseCases: FirestoreUseCases,
+    private val realtimeUseCases: RealtimeUseCases,
     private val preference: Preference
 ) : ViewModel() {
     private val _state = MutableStateFlow(CommentState())
@@ -24,7 +28,8 @@ class CommentViewModel @Inject constructor(
     init {
         _state.update {
             it.copy(
-                userName = preference.userName?:"test"
+                userName = preference.userName?:"test",
+                tableName = preference.tableName?:"test"
             )
         }
     }
@@ -39,21 +44,60 @@ class CommentViewModel @Inject constructor(
                         )
                     }
                 }
+                is CommentEvent.GetCmtHistories -> {
+                    try {
+                        realtimeUseCases.getItems(
+                            data = CommentRequestResponse(
+                                msgId = event.imgId,
+                                group = "families")
+                        ).collect{liveData ->
+                            when(liveData){
+                                is Resource.Failure -> {
+                                }
+                                Resource.Loading -> {
+                                }
+                                is Resource.Success -> {
+                                    println(liveData.data)
+                                    _state.update {
+                                        it.copy(
+                                            cmtList = liveData.data,
+                                            imgId = event.imgId
+                                        )
+                                    }
+                                }
+                            }
 
+                        }
+
+                    }catch (e: Exception){
+                     e.printStackTrace()
+                    }
+                }
                 CommentEvent.SetChatHistory -> {
+                    val test = realtimeUseCases.insert(data = CommentRequestResponse(
+                        cmt = state.value.userMsg,
+                        msgId = state.value.imgId,
+                        cmtUser = preference.userName ?: "test",
+                        time = MyDate.CurrentDateTimeSDF(),
+                        group = "families"
+
+                    ))
                     _state.update {
                         it.copy(
-                            cmtList = state.value.cmtList + CommentRequestResponse(
-                                cmt = state.value.userMsg,
-                                msgId = preference.tableName ?: "test",
-                                cmtUser = preference.userName ?: "test",
-                                time = MyDate.CurrentDateTimeSDF(),
-                                group = "families"
-
-                            ),
-                            userMsg = ""
+                            userMsg = "",
+                            newMsgSent = true
                         )
                     }
+                }
+
+                is CommentEvent.UpdateStories -> {
+                    firestoreUseCases.updateCommentedUserInStories(
+                        data = StoriesDetailRequestResponse(
+                            group = "families",
+                            userId = event.value,
+                            cmtUserProfile = preference.gmailProfile?:"test"
+                        )
+                    )
                 }
             }
         }

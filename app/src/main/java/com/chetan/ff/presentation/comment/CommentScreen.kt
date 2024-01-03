@@ -1,25 +1,23 @@
 package com.chetan.ff.presentation.comment
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,38 +25,35 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CommentScreen(
-    nav: NavHostController,
-    onBack: () -> Unit,
     state: CommentState,
-    onEvent: (onEvent: CommentEvent) -> Unit
+    onEvent: (onEvent: CommentEvent) -> Unit,
+    id: List<String>,
+    nav: NavHostController
 ) {
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(navigationIcon = {
-            Card(
-                elevation = CardDefaults.cardElevation(10.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
-            ) {
-                IconButton(modifier = Modifier.size(40.dp), onClick = { onBack() }) {
-                    Icon(
-                        modifier = Modifier.size(40.dp),
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = ""
-                    )
-                }
-            }
+    state.imgId.ifBlank {
+        onEvent(CommentEvent.GetCmtHistories(id.first()))
+    }
+    BackHandler {
+       if (state.newMsgSent && state.cmtList.last().item.cmtUser != state.tableName){
+           onEvent(CommentEvent.UpdateStories(id.last()))
+       }
+        nav.popBackStack()
 
-        }, title = {
-
-        })
-    }, content = {
+    }
+    Scaffold(content = {
         Column(
             modifier = Modifier
                 .padding(it)
@@ -73,16 +68,16 @@ fun CommentScreen(
             ) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), reverseLayout = true, content = {
                     items(state.cmtList.reversed()) { data ->
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
                         Box(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Card(
                                 modifier = Modifier
                                     .padding(10.dp)
-                                    .align(if (state.userName == data.cmtUser) Alignment.CenterEnd else Alignment.CenterStart),
+                                    .align(if (state.userName == data.item.cmtUser) Alignment.CenterEnd else Alignment.CenterStart),
                                 elevation = CardDefaults.cardElevation(10.dp),
-                                colors = if (state.userName == data.cmtUser) {
+                                colors = if (state.userName == data.item.cmtUser) {
                                     CardDefaults.cardColors(
                                         MaterialTheme.colorScheme.primaryContainer
                                     )
@@ -91,25 +86,35 @@ fun CommentScreen(
                                 }
 
                             ) {
-                                Column(modifier = Modifier.padding(10.dp)) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                                var showTime by remember {
+                                    mutableStateOf(false)
+                                }
+                                Column(modifier = Modifier
+                                    .padding(10.dp)
+                                    .clickable(
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() } // This is mandatory
+                                    ) {
+                                        showTime = !showTime
+                                    }
+                                ) {
+                                    if (showTime) {
                                         Text(
-                                            text = data.cmtUser,
-                                            style = MaterialTheme.typography.titleSmall
-                                        )
-                                        Text(
-//                                            text = MyDate.differenceOfDates(
-//                                                data.time,
-//                                                System.currentTimeMillis().toString()
-//                                            ),
-                                            text = "2232",
+                                            text = data.item.time,
                                             style = MaterialTheme.typography.bodySmall.copy(
                                                 color = MaterialTheme.colorScheme.outline
                                             )
                                         )
                                     }
+
                                     Text(
-                                        text = data.cmt,
+                                        text = data.item.cmtUser,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        fontSize = 10.sp
+
+                                    )
+                                    Text(
+                                        text = data.item.cmt,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
