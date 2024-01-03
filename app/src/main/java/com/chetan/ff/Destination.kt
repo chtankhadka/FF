@@ -11,6 +11,8 @@ open class Destination(open val route: String) {
         //music player
         object MusicPlayerDestination : Destination("music-player-screen")
 
+        object CommentDestination: Destination("comment-screen")
+
 
     }
 }

@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.chetan.ff.Destination
 import com.chetan.ff.R
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.utils.LoadLottieAnimation
@@ -137,8 +138,6 @@ fun HomeScreen(
             }
         }
     })
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -235,56 +234,64 @@ fun HomeScreen(
                             info = state.ffLocations
                         )
                     }
-                    when(state.ffLocations[page].weather){
-                        "Rain" ->{
+                    when (state.ffLocations[page].weather) {
+                        "Rain" -> {
                             LoadLottieAnimation(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .align(Alignment.TopEnd), image = R.raw.raining
-                        )}
-                        "Snow" ->{
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .align(Alignment.TopEnd), image = R.raw.raining
+                            )
+                        }
+
+                        "Snow" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.snow
                             )
                         }
-                        "Clouds" ->{
+
+                        "Clouds" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.cloudy
                             )
                         }
-                        "Atmosphere" ->{
+
+                        "Atmosphere" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.sunny
                             )
                         }
-                        "Clear" ->{
+
+                        "Clear" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.sunny
                             )
                         }
-                        "Drizzle" ->{
+
+                        "Drizzle" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.sunny
                             )
                         }
-                        "Thunderstorm" ->{
+
+                        "Thunderstorm" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .align(Alignment.TopEnd), image = R.raw.thunder
                             )
                         }
-                        else ->{
+
+                        else -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
@@ -292,12 +299,25 @@ fun HomeScreen(
                             )
                         }
                     }
-                }
+                    Card(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 20.dp, bottom = 10.dp),
+                        shape = CircleShape
+                    ) {
+                        AsyncImage(
+                            modifier = Modifier.size(50.dp),
+                            model = state.ffLocations[page].userProfile,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = ""
+                        )
+                    }
 
+                }
 
             }
             Spacer(modifier = Modifier.height(10.dp))
-            listEg.forEach { item ->
+            state.stories.forEach { item ->
                 Box {
                     Card(
                         modifier = Modifier
@@ -307,7 +327,7 @@ fun HomeScreen(
                     ) {
                         AsyncImage(
                             modifier = Modifier.fillMaxWidth(),
-                            model = item,
+                            model = item.imageUrl,
                             contentScale = ContentScale.Crop,
                             contentDescription = ""
                         )
@@ -318,7 +338,9 @@ fun HomeScreen(
                             .padding(end = 15.dp, top = 10.dp),
                         horizontalAlignment = Alignment.End
                     ) {
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = {
+                            navController.navigate(Destination.Screen.CommentDestination.route)
+                        }) {
                             Icon(
                                 modifier = Modifier.size(50.dp),
                                 imageVector = Icons.Filled.Comment,

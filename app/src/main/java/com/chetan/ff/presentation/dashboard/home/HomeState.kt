@@ -2,6 +2,7 @@ package com.chetan.ff.presentation.dashboard.home
 
 import android.content.Context
 import android.location.LocationManager
+import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.data.model.weather.WeatherUsingLatLngResponse
 
@@ -15,4 +16,5 @@ data class HomeState(
         wind = WeatherUsingLatLngResponse.Wind()
     ),
     val ffLocations: List<UpdateStatusRequestResponse> = emptyList(),
+    val stories : List<StoriesDetailRequestResponse> = emptyList()
 )

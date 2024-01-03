@@ -14,7 +14,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chetan.ff.presentation.comment.CommentScreen
+import com.chetan.ff.presentation.comment.CommentViewModel
 import com.chetan.ff.presentation.dashboard.DashboardScreen
+import com.chetan.ff.presentation.dashboard.DashboardViewModel
 import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
 import com.chetan.ff.presentation.google_sign_in.SignInScreen
 import com.chetan.ff.presentation.google_sign_in.SignInViewModel
@@ -87,9 +90,25 @@ fun AppNavHost(
            }
        }
        composable(Destination.Screen.DashboardDestination.route){
+           val viewModel = hiltViewModel<DashboardViewModel>()
+           val state by viewModel.state.collectAsStateWithLifecycle()
            DashboardScreen(
                nav = navController,
-               onBack = onBack
+               onBack = onBack,
+               state = state,
+               onEvent = viewModel.onEvent
+
+           )
+       }
+       composable(Destination.Screen.CommentDestination.route){
+           val viewModel = hiltViewModel<CommentViewModel>()
+           val state by viewModel.state.collectAsStateWithLifecycle()
+           CommentScreen(
+               nav = navController,
+               onBack = onBack,
+               state = state,
+               onEvent = viewModel.onEvent
+
            )
        }
 

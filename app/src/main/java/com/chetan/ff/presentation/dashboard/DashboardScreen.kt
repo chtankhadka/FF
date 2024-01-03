@@ -1,17 +1,27 @@
 package com.chetan.ff.presentation.dashboard
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.LocalContentColor
@@ -26,6 +36,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -38,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -46,10 +58,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.chetan.ff.R
 import com.chetan.ff.presentation.dashboard.home.HomeScreen
 import com.chetan.ff.presentation.dashboard.home.HomeViewModel
 import com.chetan.ff.presentation.dashboard.library.LibraryScreen
+import com.chetan.ff.presentation.dialogs.MessageDialog
 import com.chetan.ff.utils.BottomNavigate.bottomNavigate
 import kotlinx.coroutines.delay
 
@@ -61,10 +75,17 @@ data class InnerPage(
     val isBadge: Boolean = false
 )
 
+
 @Composable
-fun DashboardScreen(nav: NavHostController, onBack: () -> Unit) {
+fun DashboardScreen(
+    nav: NavHostController,
+    onBack: () -> Unit,
+    state: DashboardState,
+    onEvent: (event: DashboardEvent) -> Unit,
+) {
     val bottomNavController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var backPressCount by remember {
         mutableIntStateOf(0)
@@ -75,6 +96,14 @@ fun DashboardScreen(nav: NavHostController, onBack: () -> Unit) {
             backPressCount = 0
         }
     })
+    BackHandler {
+        if (backPressCount == 0) {
+            Toast.makeText(context, "Press again to exit", Toast.LENGTH_SHORT).show()
+            backPressCount++
+        } else if (backPressCount == 1) {
+            onBack()
+        }
+    }
     val items: List<InnerPage> = remember {
         listOf(
             InnerPage("home", R.string.home, Icons.Default.Home),
@@ -87,6 +116,57 @@ fun DashboardScreen(nav: NavHostController, onBack: () -> Unit) {
             )
         )
     }
+    var profileImgUri by remember {
+        mutableStateOf<Uri>(Uri.EMPTY)
+    }
+    var showDailog by remember {
+        mutableStateOf(false)
+    }
+    if (showDailog && profileImgUri != Uri.EMPTY) {
+        Dialog(onDismissRequest = { /*TODO*/ }) {
+            Card(elevation = CardDefaults.cardElevation(10.dp)) {
+                AsyncImage(modifier = Modifier, model = profileImgUri, contentDescription = "")
+                Row {
+                    Button(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .weight(0.5f),
+                        elevation = ButtonDefaults.buttonElevation(10.dp),
+                        onClick = {
+                            onEvent(DashboardEvent.UploadImage(profileImgUri))
+                            showDailog = false
+                        }) {
+                        Text(text = "Upload")
+                    }
+                    Button(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .weight(0.5f),
+                        elevation = ButtonDefaults.buttonElevation(10.dp),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                        onClick = {
+                            showDailog = false
+                            profileImgUri = Uri.EMPTY
+                        }) {
+                        Text(text = "Cancel")
+                    }
+                }
+
+            }
+        }
+    }
+    val photoPickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri ->
+                uri?.let {
+                    profileImgUri = uri
+                    showDailog = true
+                }
+
+            })
+
+
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
@@ -148,7 +228,31 @@ fun DashboardScreen(nav: NavHostController, onBack: () -> Unit) {
                 }
             }
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier
+                    .padding(end = 5.dp)
+                    .size(40.dp),
+                onClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }) {
+                Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "")
+            }
+        },
     ) {
+        state.infoMsg?.let {
+            MessageDialog(message = it, onDismissRequest = {
+                if (onEvent != null && state.infoMsg.isCancellable == true) {
+                    onEvent(DashboardEvent.DismissInfoMsg)
+                }
+            }, onPositive = { /*TODO*/ }) {
+
+            }
+        }
         NavHost(
             modifier = Modifier.padding(it),
             navController = bottomNavController,

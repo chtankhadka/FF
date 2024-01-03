@@ -1,6 +1,7 @@
 package com.chetan.ff.domain.repository
 
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 
 interface FirestoreRepository{
@@ -12,6 +13,12 @@ interface FirestoreRepository{
     suspend fun getAllStatus(
         group: String
     ) : Resource<List<UpdateStatusRequestResponse>>
+    suspend fun getStories(
+        group: String
+    ) : Resource<List<StoriesDetailRequestResponse>>
+    suspend fun setStories(
+        data: StoriesDetailRequestResponse
+    ): Resource<Boolean>
 
 
 }

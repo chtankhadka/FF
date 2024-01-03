@@ -1,6 +1,7 @@
 package com.chetan.ff.data.repositoryImpl
 
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.domain.repository.FirestoreRepository
 import com.chetan.orderdelivery.data.local.Preference
@@ -47,6 +48,47 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             }
             Resource.Success(data.sortedByDescending { it.date })
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+    override suspend fun getStories(group: String): Resource<List<StoriesDetailRequestResponse>> {
+        return try {
+            var data  = mutableListOf<StoriesDetailRequestResponse>()
+            val documents = firestore.collection("ff")
+                .document(group)
+                .collection("stories")
+                .get()
+                .await()
+            for(document in documents.documents){
+                val item = document.toObject<StoriesDetailRequestResponse>()
+                item?.let {
+                    data.add(it)
+                }
+            }
+            Resource.Success(data.sortedByDescending { it.time })
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+    override suspend fun setStories(data: StoriesDetailRequestResponse): Resource<Boolean> {
+        return try {
+            var status = true
+            firestore.collection("ff")
+                .document(data.group)
+                .collection("stories")
+                .document(data.imageId)
+                .set(data)
+                .addOnSuccessListener {
+                    status = true
+                }.addOnFailureListener {
+                    status = false
+                }.await()
+            Resource.Success(status)
         }catch (e: Exception){
             e.printStackTrace()
             Resource.Failure(e)

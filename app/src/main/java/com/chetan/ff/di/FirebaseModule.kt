@@ -1,10 +1,16 @@
 package com.chetan.ff.di
 
 import android.app.Application
+import com.chetan.ff.data.repositoryImpl.FDBRepositoryImpl
 import com.chetan.ff.data.repositoryImpl.FirestoreRepositoryImpl
+import com.chetan.ff.domain.repository.FDBRepository
 import com.chetan.ff.domain.repository.FirestoreRepository
+import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
+import com.chetan.ff.domain.use_cases.fdb.InsertImage
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.domain.use_cases.firestore.GetStatus
+import com.chetan.ff.domain.use_cases.firestore.GetStories
+import com.chetan.ff.domain.use_cases.firestore.SetStories
 import com.chetan.ff.domain.use_cases.firestore.UpdateStatus
 import com.chetan.orderdelivery.data.local.Preference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,19 +42,18 @@ object FirebaseModule {
         return FirebaseStorage.getInstance()
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideFirebaseStorageRepository(storage: FirebaseStorage): StorageRepository {
-//        return StorageRepositoryImpl(storage)
-//    }
+    @Singleton
+    @Provides
+    fun provideFirebaseStorageRepository(storage: FirebaseStorage): FDBRepository {
+        return FDBRepositoryImpl(storage)
+    }
 
-//    @Singleton
-//    @Provides
-//    fun provideStorageUseCases(repository: StorageRepository) =
-//        FirestorageUseCases(
-//            insertImage = InsertImage(repository = repository),
-//            deleteImage = DeleteImage(repository = repository)
-//        )
+    @Singleton
+    @Provides
+    fun provideStorageUseCases(repository: FDBRepository) =
+        FDBUseCases(
+            insertImage = InsertImage(repository = repository)
+        )
 
     @Singleton
     @Provides
@@ -64,6 +69,8 @@ object FirebaseModule {
     fun provideFirestoreUseCases(repository: FirestoreRepository) =
         FirestoreUseCases(
             updateStatus = UpdateStatus(frepository = repository),
-            getStatus = GetStatus(frepository = repository)
+            getStatus = GetStatus(frepository = repository),
+            setStories = SetStories(frepository = repository),
+            getStories = GetStories(frepository = repository)
         )
 }

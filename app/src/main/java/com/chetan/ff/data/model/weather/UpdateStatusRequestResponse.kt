@@ -7,5 +7,6 @@ data class UpdateStatusRequestResponse(
     val country: String = "",
     val date: String = "",
     val weather: String = "",
-    val group: String = ""
+    val group: String = "",
+    val userProfile: String = ""
 )
