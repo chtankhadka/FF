@@ -12,13 +12,13 @@
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Nexus_5X_API_30.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="adb-VKCEIJYLM7Q4GASK-QeESKn._adb-tls-connect._tcp" />
                 </Key>
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-03T22:17:58.126150648Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-01-03T22:23:58.462014953Z" />
         </State>
       </entry>
     </value>

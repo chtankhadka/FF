@@ -107,13 +107,7 @@ fun DashboardScreen(
     val items: List<InnerPage> = remember {
         listOf(
             InnerPage("home", R.string.home, Icons.Default.Home),
-            InnerPage("library", R.string.library, Icons.Default.LibraryMusic),
-            InnerPage(
-                "musicplayer",
-                R.string.musicplayer,
-                Icons.Default.PlayCircleOutline,
-                isBadge = true
-            )
+            InnerPage("library", R.string.library, Icons.Default.LibraryMusic)
         )
     }
     var profileImgUri by remember {
