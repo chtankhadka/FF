@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetStories @Inject constructor(
     private val frepository: FirestoreRepository
 ) {
-    suspend operator fun invoke(group: String) = frepository.getStories(group)
+    suspend operator fun invoke() = frepository.getStories()
 }

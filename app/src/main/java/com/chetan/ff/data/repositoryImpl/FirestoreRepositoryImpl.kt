@@ -17,7 +17,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             var status = true
             firestore.collection("ff")
-                .document(data.group)
+                .document(preference.groupName?:"test")
                 .collection("weather")
                 .document(data.id)
                 .set(data)
@@ -33,11 +33,11 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStatus(group: String): Resource<List<UpdateStatusRequestResponse>> {
+    override suspend fun getAllStatus(): Resource<List<UpdateStatusRequestResponse>> {
         return try {
             var data  = mutableListOf<UpdateStatusRequestResponse>()
             val documents = firestore.collection("ff")
-                .document(group)
+                .document(preference.groupName?:"test")
                 .collection("weather")
                 .get()
                 .await()
@@ -54,11 +54,11 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStories(group: String): Resource<List<StoriesDetailRequestResponse>> {
+    override suspend fun getStories(): Resource<List<StoriesDetailRequestResponse>> {
         return try {
             var data  = mutableListOf<StoriesDetailRequestResponse>()
             val documents = firestore.collection("ff")
-                .document(group)
+                .document(preference.groupName?:"test")
                 .collection("stories")
                 .get()
                 .await()
@@ -79,7 +79,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             var status = true
             firestore.collection("ff")
-                .document(data.group)
+                .document(preference.groupName?:"test")
                 .collection("stories")
                 .document(data.userId)
                 .set(data)
@@ -98,7 +98,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun updateCommentedUserInStories(data: StoriesDetailRequestResponse): Resource<Boolean> {
         return try {
             firestore.collection("ff")
-                .document(data.group)
+                .document(preference.groupName?:"test")
                 .collection("stories")
                 .document(data.userId)
                 .update("cmtUserProfile", data.cmtUserProfile)

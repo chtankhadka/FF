@@ -51,8 +51,8 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseStorageRepository(storage: FirebaseStorage): FDBRepository {
-        return FDBRepositoryImpl(storage)
+    fun provideFirebaseStorageRepository(storage: FirebaseStorage, preference: Preference): FDBRepository {
+        return FDBRepositoryImpl(storage,preference)
     }
 
     @Singleton
@@ -91,8 +91,8 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseRealtimeRepository(realtime: FirebaseDatabase): RealtimeRepository {
-        return RealtimeRepositoryImpl(realtime)
+    fun provideFirebaseRealtimeRepository(realtime: FirebaseDatabase,preference: Preference): RealtimeRepository {
+        return RealtimeRepositoryImpl(realtime,preference)
     }
 
     @Singleton

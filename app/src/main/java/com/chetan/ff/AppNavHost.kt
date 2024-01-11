@@ -1,6 +1,7 @@
 package com.chetan.ff
 
 import android.content.Context
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -14,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chetan.ff.common.ApplicationAction
 import com.chetan.ff.presentation.comment.CommentScreen
 import com.chetan.ff.presentation.comment.CommentViewModel
 import com.chetan.ff.presentation.dashboard.DashboardScreen
@@ -96,7 +98,24 @@ fun AppNavHost(
                nav = navController,
                onBack = onBack,
                state = state,
-               onEvent = viewModel.onEvent
+               onEvent = viewModel.onEvent,
+               onAction = { applicationAction ->
+                   when (applicationAction) {
+                       ApplicationAction.Restart -> {
+                           val intent = Intent(applicationContext, MainActivity::class.java)
+                           intent.flags =
+                               Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                           applicationContext.startActivity(intent)
+                       }
+
+                       ApplicationAction.Logout -> {
+                           lifecycleScope.launch {
+                               googleAuthUiClient.signOut()
+                               navController.cleanNavigate(Destination.Screen.SignInDestination.route)
+                           }
+                       }
+                   }
+               }
 
            )
        }

@@ -49,7 +49,7 @@ class CommentViewModel @Inject constructor(
                         realtimeUseCases.getItems(
                             data = CommentRequestResponse(
                                 msgId = event.imgId,
-                                group = "families")
+                                group = preference.groupName?:"test")
                         ).collect{liveData ->
                             when(liveData){
                                 is Resource.Failure -> {
@@ -79,7 +79,7 @@ class CommentViewModel @Inject constructor(
                         msgId = state.value.imgId,
                         cmtUser = preference.userName ?: "test",
                         time = MyDate.CurrentDateTimeSDF(),
-                        group = "families"
+                        group = preference.groupName?:"test"
 
                     ))
                     _state.update {
@@ -93,7 +93,7 @@ class CommentViewModel @Inject constructor(
                 is CommentEvent.UpdateStories -> {
                     firestoreUseCases.updateCommentedUserInStories(
                         data = StoriesDetailRequestResponse(
-                            group = "families",
+                            group = preference.groupName?:"test",
                             userId = event.value,
                             cmtUserProfile = preference.gmailProfile?:"test"
                         )

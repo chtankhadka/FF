@@ -6,34 +6,47 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
 import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +55,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -60,12 +74,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.chetan.ff.R
+import com.chetan.ff.common.ApplicationAction
 import com.chetan.ff.presentation.dashboard.home.HomeScreen
 import com.chetan.ff.presentation.dashboard.home.HomeViewModel
 import com.chetan.ff.presentation.dashboard.library.LibraryScreen
 import com.chetan.ff.presentation.dialogs.MessageDialog
 import com.chetan.ff.utils.BottomNavigate.bottomNavigate
+import com.chetan.ff.utils.LoadLottieAnimation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 data class InnerPage(
     val route: String,
@@ -75,13 +92,13 @@ data class InnerPage(
     val isBadge: Boolean = false
 )
 
-
 @Composable
 fun DashboardScreen(
     nav: NavHostController,
     onBack: () -> Unit,
     state: DashboardState,
     onEvent: (event: DashboardEvent) -> Unit,
+    onAction: (ApplicationAction) -> Unit
 ) {
     val bottomNavController = rememberNavController()
     val scope = rememberCoroutineScope()
@@ -159,112 +176,243 @@ fun DashboardScreen(
                 }
 
             })
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    var hideOpenBar by remember {
+        mutableStateOf(true)
+    }
+    SideEffect {
+        scope.launch {
+            delay(1500)
+            hideOpenBar = false
+        }
 
+    }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        bottomBar = {
-            BottomAppBar(
-                containerColor = Color.Transparent
+    var showCreateGroupDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showCreateGroupDialog) {
+        Dialog(onDismissRequest = {
+
+        }
+        ) {
+            val ctx = LocalContext.current
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
-                items.forEach { screen ->
-                    val isSelected =
-                        navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                    val color = if (isSelected) Color.White else MaterialTheme.colorScheme.outline
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Create Your Group",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                LoadLottieAnimation(
+                    modifier = Modifier.size(200.dp),
+                    image = R.raw.groups
+                )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    CompositionLocalProvider(LocalContentColor provides color) {
-                        NavigationBarItem(
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                    LocalAbsoluteTonalElevation.current
-                                )
-                            ),
-                            icon = {
-                                Card(
-                                    modifier = Modifier.size(34.dp),
-                                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
-                                    elevation = CardDefaults.cardElevation(10.dp),
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(2.dp)
-                                    ) {
-                                        Icon(
-                                            modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .size(20.dp),
-                                            imageVector = screen.icon,
-                                            tint = color,
-                                            contentDescription = ""
-                                        )
-                                        Text(
-                                            text = if (screen.isBadge) "" else "",
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(end = 2.dp),
-                                            fontSize = 8.sp,
-                                            textAlign = TextAlign.Right,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
-                                    }
-
-                                }
-                            },
-                            selected = isSelected,
-                            onClick = { bottomNavController.bottomNavigate(screen.route) },
-                            label = {},
-                            alwaysShowLabel = false
-                        )
+                OutlinedTextField(
+                    value = state.onChangeGroupName,
+                    onValueChange = {
+                        onEvent(DashboardEvent.OnGroupNameChange(it))
+                    },
+                    label = {
+                        Text("Group Name")
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        .also { Arrangement.Center }) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = state.onChangeGroupName.isNotBlank(),
+                        onClick = {
+                            onEvent(DashboardEvent.SetGroupName(state.onChangeGroupName))
+                            onAction(ApplicationAction.Restart)
+                        }) {
+                        Text(text = "Create")
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                        onClick = {
+                            showCreateGroupDialog = false
+                        }) {
+                        Text(text = "Cancel")
                     }
                 }
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(end = 5.dp)
-                    .size(40.dp),
-                onClick = {
-                    photoPickerLauncher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                        )
-                    )
-                }) {
-                Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "")
-            }
-        },
-    ) {
-        state.infoMsg?.let {
-            MessageDialog(message = it, onDismissRequest = {
-                if (onEvent != null && state.infoMsg.isCancellable == true) {
-                    onEvent(DashboardEvent.DismissInfoMsg)
-                }
-            }, onPositive = { /*TODO*/ }) {
 
             }
         }
-        NavHost(
-            modifier = Modifier.padding(it),
-            navController = bottomNavController,
-            startDestination = "home"
+    }
+
+    ModalNavigationDrawer(
+        gesturesEnabled = true,
+        drawerState = drawerState,
+        scrimColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        drawerContent = {
+            AdminDashboardModalDrawerPage(
+                state = state,
+                onClick = {
+                    when (it) {
+                        MenuItem.SendNotice -> {
+
+                        }
+
+                        MenuItem.Logout -> {
+                            onAction(ApplicationAction.Logout)
+                        }
+
+                        MenuItem.CreateGroup -> {
+                            showCreateGroupDialog = true
+                        }
+
+                        MenuItem.GroupRequest -> {
+
+                        }
+
+                        MenuItem.JoinGroup -> {
+
+                        }
+
+                        MenuItem.RequestStatus -> {
+
+                        }
+                    }
+                })
+        }) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            bottomBar = {
+                BottomAppBar(
+                    containerColor = Color.Transparent
+                ) {
+                    val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
+                    items.forEach { screen ->
+                        val isSelected =
+                            navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
+                        val color =
+                            if (isSelected) Color.White else MaterialTheme.colorScheme.outline
+
+                        CompositionLocalProvider(LocalContentColor provides color) {
+                            NavigationBarItem(
+                                colors = NavigationBarItemDefaults.colors(
+                                    indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                        LocalAbsoluteTonalElevation.current
+                                    )
+                                ),
+                                icon = {
+                                    Card(
+                                        modifier = Modifier.size(34.dp),
+                                        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
+                                        elevation = CardDefaults.cardElevation(10.dp),
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(2.dp)
+                                        ) {
+                                            Icon(
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .size(20.dp),
+                                                imageVector = screen.icon,
+                                                tint = color,
+                                                contentDescription = ""
+                                            )
+                                            Text(
+                                                text = if (screen.isBadge) "" else "",
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(end = 2.dp),
+                                                fontSize = 8.sp,
+                                                textAlign = TextAlign.Right,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White
+                                            )
+                                        }
+
+                                    }
+                                },
+                                selected = isSelected,
+                                onClick = { bottomNavController.bottomNavigate(screen.route) },
+                                label = {},
+                                alwaysShowLabel = false
+                            )
+                        }
+                    }
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                        .size(40.dp),
+                    onClick = {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    }) {
+                    Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "")
+                }
+            },
         ) {
-            composable("home") {
-                val viewModel = hiltViewModel<HomeViewModel>()
-                HomeScreen(
-                    navController = nav,
-                    event = viewModel.onEvent,
-                    state = viewModel.state.collectAsStateWithLifecycle().value
-                )
+
+            state.infoMsg?.let {
+                MessageDialog(message = it, onDismissRequest = {
+                    if (onEvent != null && state.infoMsg.isCancellable == true) {
+                        onEvent(DashboardEvent.DismissInfoMsg)
+                    }
+                }, onPositive = { /*TODO*/ }) {
+
+                }
             }
-            composable("library") {
-                LibraryScreen(
-                    navController = nav
-                )
+            Box {
+                NavHost(
+                    modifier = Modifier.padding(it),
+                    navController = bottomNavController,
+                    startDestination = "home"
+                ) {
+                    composable("home") {
+                        val viewModel = hiltViewModel<HomeViewModel>()
+                        HomeScreen(
+                            navController = nav,
+                            event = viewModel.onEvent,
+                            state = viewModel.state.collectAsStateWithLifecycle().value
+                        )
+                    }
+                    composable("library") {
+                        LibraryScreen(
+                            navController = nav
+                        )
+                    }
+                }
+                if (hideOpenBar) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardDoubleArrowRight,
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
             }
+
         }
     }
 

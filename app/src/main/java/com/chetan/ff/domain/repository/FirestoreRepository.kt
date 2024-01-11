@@ -11,10 +11,8 @@ interface FirestoreRepository{
     ): Resource<Boolean>
 
     suspend fun getAllStatus(
-        group: String
     ) : Resource<List<UpdateStatusRequestResponse>>
     suspend fun getStories(
-        group: String
     ) : Resource<List<StoriesDetailRequestResponse>>
     suspend fun setStories(
         data: StoriesDetailRequestResponse

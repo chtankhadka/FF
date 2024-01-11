@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetStatus @Inject constructor(
     private val frepository: FirestoreRepository
 ) {
-    suspend operator fun invoke(group: String) = frepository.getAllStatus(group)
+    suspend operator fun invoke() = frepository.getAllStatus()
 }

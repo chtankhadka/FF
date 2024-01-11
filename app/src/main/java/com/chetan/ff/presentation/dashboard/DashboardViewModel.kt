@@ -10,14 +10,11 @@ import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.presentation.dialogs.Message
 import com.chetan.orderdelivery.data.local.Preference
-import com.google.type.DateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,9 +25,6 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel(){
     private val _state = MutableStateFlow(DashboardState())
     val state: StateFlow<DashboardState> = _state
-    init {
-
-    }
     val onEvent: (event : DashboardEvent) -> Unit = {event ->
             viewModelScope.launch {
                 when(event){
@@ -49,7 +43,7 @@ class DashboardViewModel @Inject constructor(
 
                         val requestUrl = fdbUseCases.insertImage(
                             data = ImageStorageDetails(
-                                imageUri = event.value, imagePath = "/groups/families/", imageName = preference.tableName?:"test"
+                                imageUri = event.value, imageName = preference.tableName?:"test"
                             )
                         )
                         when (requestUrl) {
@@ -61,7 +55,7 @@ class DashboardViewModel @Inject constructor(
                                         userId = preference.tableName?:"test",
                                         imageUrl = requestUrl.data.second,
                                         time = System.currentTimeMillis().toString(),
-                                        group = "families"
+                                        group = preference.groupName?:"test"
                                     )
                                 )
                                 when(setStory){
@@ -87,6 +81,22 @@ class DashboardViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 infoMsg = null
+                            )
+                        }
+                    }
+
+                    is DashboardEvent.SetGroupName -> {
+                        preference.groupName = event.value
+                        _state.update {
+                            it.copy(
+                                groupName = event.value
+                            )
+                        }
+                    }
+                    is DashboardEvent.OnGroupNameChange -> {
+                        _state.update {
+                            it.copy(
+                                onChangeGroupName = event.value
                             )
                         }
                     }

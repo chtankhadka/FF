@@ -25,9 +25,11 @@ class SignInViewModel @Inject constructor(
             )
         }
         if (state.value.isSignInSuccessful){
-            preference.tableName = result.data?.userEmail?.split("@")?.get(0)
+            val mail = result.data?.userEmail?.split("@")?.get(0).toString()
+            preference.tableName = mail
             preference.userName = result.data?.username
             preference.gmailProfile = result.data?.profilePictureUrl
+            preference.groupName = mail.replace(Regex("[^A-Za-z0-9 ]"), "a")
         }
     }
 

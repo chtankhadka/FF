@@ -21,7 +21,7 @@ class Preference @Inject constructor(
         private const val TABLE_NAME = "TABLE_NAME"
         private const val GMAIL_PROFILE = "GMAIL_PROFILE"
         private const val NOTIFICATION = "NOTIFICATION"
-        private const val PHONE = "PHONE"
+        private const val GROUP_NAME = "GROUP_NAME"
     }
 
     var isDarkMode
@@ -44,8 +44,8 @@ class Preference @Inject constructor(
         get() = sharedPreference.getString(TABLE_NAME,"")
         set(value) {sharedPreference.edit().putString(TABLE_NAME,value).apply()}
 
-    var phone
-        get() = sharedPreference.getString(PHONE,"")
-        set(value) {sharedPreference.edit().putString(PHONE,value).apply()}
+    var groupName
+        get() = sharedPreference.getString(GROUP_NAME,"")
+        set(value) {sharedPreference.edit().putString(GROUP_NAME,value).apply()}
 
 }

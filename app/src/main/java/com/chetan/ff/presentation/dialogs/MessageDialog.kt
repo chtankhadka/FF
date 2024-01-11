@@ -34,7 +34,7 @@ sealed class Message(
     open val title: String,
     open val description: String?,
     open val isCancellable: Boolean
-){
+) {
     data class Success(
         override val image: ImageVector? = null,
         override val lottieImage: Int? = null,
@@ -44,7 +44,16 @@ sealed class Message(
         override val title: String = "Success",
         override val description: String,
         override val isCancellable: Boolean = true
-    ) : Message(image,lottieImage,yesNoRequired,positiveButton,negativeButton,title,description,isCancellable)
+    ) : Message(
+        image,
+        lottieImage,
+        yesNoRequired,
+        positiveButton,
+        negativeButton,
+        title,
+        description,
+        isCancellable
+    )
 
     data class Loading(
         override val image: ImageVector? = null,
@@ -55,7 +64,16 @@ sealed class Message(
         override val title: String = "Loading",
         override val description: String,
         override val isCancellable: Boolean = true
-    ) : Message(image,lottieImage,yesNoRequired,positiveButton,negativeButton,title,description,isCancellable)
+    ) : Message(
+        image,
+        lottieImage,
+        yesNoRequired,
+        positiveButton,
+        negativeButton,
+        title,
+        description,
+        isCancellable
+    )
 
 
     data class Error(
@@ -67,7 +85,16 @@ sealed class Message(
         override val title: String = "Error",
         override val description: String,
         override val isCancellable: Boolean = true
-    ) : Message(image,lottieImage,yesNoRequired,positiveButton,negativeButton,title,description,isCancellable)
+    ) : Message(
+        image,
+        lottieImage,
+        yesNoRequired,
+        positiveButton,
+        negativeButton,
+        title,
+        description,
+        isCancellable
+    )
 
 }
 
@@ -78,12 +105,13 @@ fun MessageDialog(
     onDismissRequest: (() -> Unit)?,
     onPositive: () -> Unit,
     onNegative: () -> Unit
-){
+) {
     Dialog(onDismissRequest = {
         if (onDismissRequest != null) {
             onDismissRequest()
         }
-    }) {
+    }
+    ) {
         val ctx = LocalContext.current
         Column(
             Modifier
@@ -103,22 +131,23 @@ fun MessageDialog(
 //                modifier = Modifier.size(145.dp),
 //                contentDescription = null
 //            )
-            if (message.lottieImage != null){
+            if (message.lottieImage != null) {
                 LoadLottieAnimation(
-                    modifier = Modifier.size(200.dp) ,
+                    modifier = Modifier.size(200.dp),
                     image = message.lottieImage!!
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = message.description?:"",
+                text = message.description ?: "",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.outline)
             )
             Spacer(modifier = Modifier.height(34.dp))
-            if (message.yesNoRequired){
+            if (message.yesNoRequired) {
                 Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp).also { Arrangement.Center }){
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        .also { Arrangement.Center }) {
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = {

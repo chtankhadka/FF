@@ -4,7 +4,8 @@ import com.chetan.ff.presentation.dialogs.Message
 import com.chetan.ff.utils.FFScreenState
 
 data class DashboardState(
-    val test: String = "",
+    val groupName: String = "",
+    val onChangeGroupName:String = "",
     override val infoMsg: Message? = null
 ) : FFScreenState(infoMsg)
 

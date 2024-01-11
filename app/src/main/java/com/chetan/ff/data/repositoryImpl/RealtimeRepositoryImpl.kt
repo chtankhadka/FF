@@ -4,6 +4,7 @@ import com.chetan.ff.data.Resource
 import com.chetan.ff.data.model.CommentRequestResponse
 import com.chetan.ff.data.model.RealtimeModelResponse
 import com.chetan.ff.domain.repository.RealtimeRepository
+import com.chetan.orderdelivery.data.local.Preference
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -15,12 +16,13 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class RealtimeRepositoryImpl @Inject constructor(
-    private val realtime: FirebaseDatabase
+    private val realtime: FirebaseDatabase,
+    private val preference: Preference
 ) : RealtimeRepository {
 
     override suspend fun insert(item: CommentRequestResponse): Resource<String> {
         return try {
-            realtime.getReference("comments/${item.group}").child(item.msgId).push().setValue(item).await()
+            realtime.getReference("comments/${preference.groupName?:"test"}").child(item.msgId).push().setValue(item).await()
             Resource.Success("")
         } catch (e: Exception) {
             e.printStackTrace()
@@ -45,9 +47,9 @@ class RealtimeRepositoryImpl @Inject constructor(
             }
 
         }
-        realtime.getReference("comments/${data.group}").child(data.msgId).addValueEventListener(valueEvent)
+        realtime.getReference("comments/${preference.groupName?:"test"}").child(data.msgId).addValueEventListener(valueEvent)
         awaitClose {
-            realtime.getReference("comments/${data.group}").child(data.msgId).removeEventListener(valueEvent)
+            realtime.getReference("comments/${preference.groupName?:"test"}").child(data.msgId).removeEventListener(valueEvent)
             close()
         }
 

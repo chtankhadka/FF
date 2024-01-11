@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
                             country = result.sys.country,
                             date = result.dt.toString(),
                             weather = result.weather.first().main,
-                            group = "families",
+                            group = preference.groupName?:"test",
                             userProfile = preference.gmailProfile?:""
                         ))
                         when(updateWeather){
@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
     }
     private fun getStories(){
         viewModelScope.launch {
-            val data = firestoreUseCases.getStories("families")
+            val data = firestoreUseCases.getStories()
             when(data){
                 is Resource.Failure -> {
 
@@ -102,7 +102,7 @@ class HomeViewModel @Inject constructor(
     }
     private fun getStatus(){
         viewModelScope.launch {
-            val data = firestoreUseCases.getStatus("families")
+            val data = firestoreUseCases.getStatus()
             when(data){
                 is Resource.Failure -> {
 

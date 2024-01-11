@@ -86,10 +86,6 @@ fun HomeScreen(
     event: (event: HomeEvent) -> Unit,
     state: HomeState
 ) {
-    var hide by remember {
-        mutableStateOf(false)
-    }
-
     //location
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -284,6 +280,13 @@ fun HomeScreen(
                                     .align(Alignment.TopEnd), image = R.raw.thunder
                             )
                         }
+                        "Mist" -> {
+                            LoadLottieAnimation(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .align(Alignment.TopEnd), image = R.raw.mist
+                            )
+                        }
 
                         else -> {
                             LoadLottieAnimation(
@@ -346,7 +349,7 @@ fun HomeScreen(
                                 contentDescription = ""
                             )
                         }
-                        if (item.cmtUserProfile.isNotBlank() && item.cmtUserProfile != state.myProfile){
+                        if (item.cmtUserProfile.isNotBlank() && item.cmtUserProfile != state.myProfile) {
                             Card(
                                 modifier = Modifier,
                                 shape = CircleShape,
@@ -356,7 +359,8 @@ fun HomeScreen(
                                 AsyncImage(
                                     modifier = Modifier.size(40.dp),
                                     model = item.cmtUserProfile,
-                                    contentDescription = "")
+                                    contentDescription = ""
+                                )
                             }
                         }
 

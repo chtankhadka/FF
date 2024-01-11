@@ -1,5 +1,6 @@
 package com.chetan.ff.presentation.comment
 
+import android.widget.RemoteViews.RemoteView
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -149,4 +151,19 @@ fun CommentScreen(
 
     })
 
+}
+
+@Composable
+@Preview
+fun view(){
+
+        val inputString = "h--=-0nep -- ho ello@#$%^&*("
+
+        // Use regex to remove special characters
+        val resultString = inputString.replace(Regex("[^A-Za-z0-9 ]"), "")
+
+    Text(text = resultString)
+        println("Original String: $inputString")
+        println("Result String: $resultString")
+    
 }
