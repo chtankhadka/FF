@@ -1,6 +1,7 @@
 package com.chetan.ff.data.repositoryImpl
 
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.SetGetGroupsName
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.domain.repository.FirestoreRepository
@@ -109,6 +110,48 @@ class FirestoreRepositoryImpl @Inject constructor(
             Resource.Failure(e)
         }
     }
+
+    override suspend fun setGroups(data: SetGetGroupsName): Resource<Boolean> {
+        return try {
+            var status = true
+            firestore.collection("ff")
+                .document(preference.tableName?:"test")
+                .collection("groups")
+                .document(data.groupName)
+                .set(data)
+                .addOnSuccessListener {
+                    status = true
+                }.addOnFailureListener {
+                    status = false
+                }.await()
+            Resource.Success(status)
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+    override suspend fun getGroups(): Resource<List<SetGetGroupsName>> {
+        return try {
+            var data  = mutableListOf<SetGetGroupsName>()
+            val documents = firestore.collection("ff")
+                .document(preference.tableName?:"test")
+                .collection("groups")
+                .get()
+                .await()
+            for(document in documents.documents){
+                val item = document.toObject<SetGetGroupsName>()
+                item?.let {
+                    data.add(it)
+                }
+            }
+            Resource.Success(data.sortedBy { it.groupName })
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
 
 
 }

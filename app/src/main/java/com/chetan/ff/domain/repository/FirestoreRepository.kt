@@ -1,6 +1,7 @@
 package com.chetan.ff.domain.repository
 
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.SetGetGroupsName
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 
@@ -22,5 +23,8 @@ interface FirestoreRepository{
         data: StoriesDetailRequestResponse
     ): Resource<Boolean>
 
+    suspend fun setGroups(data: SetGetGroupsName): Resource<Boolean>
+    suspend fun getGroups(
+    ): Resource<List<SetGetGroupsName>>
 
 }

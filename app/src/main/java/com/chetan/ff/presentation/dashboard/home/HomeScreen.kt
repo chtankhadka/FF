@@ -150,7 +150,7 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Family", fontSize = 50.sp, fontFamily = FontFamily.Default,
+                text = "ff", fontSize = 50.sp, fontFamily = FontFamily.Default,
 //            fontFamily = FontFamily(
 //                Font(
 //                    familyName = DeviceFontFamilyName("nepal"),
@@ -269,7 +269,7 @@ fun HomeScreen(
                             LoadLottieAnimation(
                                 modifier = Modifier
                                     .size(100.dp)
-                                    .align(Alignment.TopEnd), image = R.raw.sunny
+                                    .align(Alignment.TopEnd), image = R.raw.drizzle
                             )
                         }
 

@@ -182,7 +182,7 @@ fun DashboardScreen(
     }
     SideEffect {
         scope.launch {
-            delay(1500)
+            delay(5000)
             hideOpenBar = false
         }
 
@@ -234,7 +234,6 @@ fun DashboardScreen(
                         enabled = state.onChangeGroupName.isNotBlank(),
                         onClick = {
                             onEvent(DashboardEvent.SetGroupName(state.onChangeGroupName))
-                            onAction(ApplicationAction.Restart)
                         }) {
                         Text(text = "Create")
                     }
@@ -251,6 +250,11 @@ fun DashboardScreen(
             }
         }
     }
+    LaunchedEffect(key1 = state.groupName, block = {
+        if (state.groupName.isNotBlank()){
+            onAction(ApplicationAction.Restart)
+        }
+    })
 
     ModalNavigationDrawer(
         gesturesEnabled = true,
@@ -404,6 +408,7 @@ fun DashboardScreen(
                             }
                         }) {
                         Icon(
+                            modifier = Modifier.size(40.dp),
                             imageVector = Icons.Default.KeyboardDoubleArrowRight,
                             contentDescription = "",
                             tint = MaterialTheme.colorScheme.primary
