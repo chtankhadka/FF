@@ -16,7 +16,9 @@ import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.domain.use_cases.realtime.RealtimeUseCases
 import com.chetan.orderdelivery.data.local.Preference
+import com.onesignal.OneSignal
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -61,7 +63,8 @@ class HomeViewModel @Inject constructor(
                             date = result.dt.toString(),
                             weather = result.weather.first().main,
                             group = preference.groupName?:"test",
-                            userProfile = preference.gmailProfile?:""
+                            userProfile = preference.gmailProfile?:"",
+                            oneSignalId = OneSignal.User.pushSubscription.id
                         ))
                         when(updateWeather){
                             is Resource.Failure -> {
@@ -71,8 +74,8 @@ class HomeViewModel @Inject constructor(
 
                             }
                             is Resource.Success -> {
-                                println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                                println(result)
+                                delay(5000)
+                                getStatus()
                             }
                         }
 

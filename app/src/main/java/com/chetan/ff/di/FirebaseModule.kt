@@ -9,6 +9,7 @@ import com.chetan.ff.domain.repository.FirestoreRepository
 import com.chetan.ff.domain.repository.RealtimeRepository
 import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.fdb.InsertImage
+import com.chetan.ff.domain.use_cases.firestore.DeleteRequestGroup
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.domain.use_cases.firestore.GetGroups
 import com.chetan.ff.domain.use_cases.firestore.GetRequestGroup
@@ -87,7 +88,8 @@ object FirebaseModule {
             getGroups = GetGroups(frepository = repository),
             setGroup = SetGroup(frepository = repository),
             requestGroup = RequestGroup(frepository = repository),
-            getRequestGroup = GetRequestGroup(frepository = repository)
+            getRequestGroup = GetRequestGroup(frepository = repository),
+            deleteRequestGroup = DeleteRequestGroup(frepository = repository)
         )
 
 

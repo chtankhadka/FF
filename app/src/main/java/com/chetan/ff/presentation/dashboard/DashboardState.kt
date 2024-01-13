@@ -11,6 +11,7 @@ data class DashboardState(
     val onChangeAdminGmail:String = "",
     val groupRequestList: List<RequestGroupDeatails> = emptyList(),
     val groupList: List<SetGetGroupsName> = emptyList(),
+    val statusList : List<String> = emptyList(),
     override val infoMsg: Message? = null
 ) : FFScreenState(infoMsg)
 

@@ -30,6 +30,7 @@ interface FirestoreRepository{
     suspend fun requestGroup(
             data: RequestGroupDeatails
     ): Resource<Boolean>
+    suspend fun deleteRequestGroup(data: RequestGroupDeatails): Resource<Boolean>
     suspend fun getRequestGroup(
     ): Resource<List<RequestGroupDeatails>>
 

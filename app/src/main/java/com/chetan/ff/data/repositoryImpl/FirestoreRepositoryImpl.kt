@@ -14,12 +14,13 @@ import javax.inject.Inject
 
 class FirestoreRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val preference: Preference):  FirestoreRepository{
+    private val preference: Preference
+) : FirestoreRepository {
     override suspend fun updateStatus(data: UpdateStatusRequestResponse): Resource<Boolean> {
         return try {
             var status = true
             firestore.collection("ff")
-                .document(preference.groupName?:"test")
+                .document(preference.groupName ?: "test")
                 .collection("weather")
                 .document(data.id)
                 .set(data)
@@ -29,7 +30,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     status = false
                 }.await()
             Resource.Success(status)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -37,20 +38,20 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun getAllStatus(): Resource<List<UpdateStatusRequestResponse>> {
         return try {
-            var data  = mutableListOf<UpdateStatusRequestResponse>()
+            var data = mutableListOf<UpdateStatusRequestResponse>()
             val documents = firestore.collection("ff")
-                .document(preference.groupName?:"test")
+                .document(preference.groupName ?: "test")
                 .collection("weather")
                 .get()
                 .await()
-            for(document in documents.documents){
+            for (document in documents.documents) {
                 val item = document.toObject<UpdateStatusRequestResponse>()
                 item?.let {
                     data.add(it)
                 }
             }
             Resource.Success(data.sortedByDescending { it.date })
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -58,20 +59,20 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun getStories(): Resource<List<StoriesDetailRequestResponse>> {
         return try {
-            var data  = mutableListOf<StoriesDetailRequestResponse>()
+            var data = mutableListOf<StoriesDetailRequestResponse>()
             val documents = firestore.collection("ff")
-                .document(preference.groupName?:"test")
+                .document(preference.groupName ?: "test")
                 .collection("stories")
                 .get()
                 .await()
-            for(document in documents.documents){
+            for (document in documents.documents) {
                 val item = document.toObject<StoriesDetailRequestResponse>()
                 item?.let {
                     data.add(it)
                 }
             }
             Resource.Success(data.sortedByDescending { it.time })
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -81,7 +82,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             var status = true
             firestore.collection("ff")
-                .document(preference.groupName?:"test")
+                .document(preference.groupName ?: "test")
                 .collection("stories")
                 .document(data.userId)
                 .set(data)
@@ -91,7 +92,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     status = false
                 }.await()
             Resource.Success(status)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -100,7 +101,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun updateCommentedUserInStories(data: StoriesDetailRequestResponse): Resource<Boolean> {
         return try {
             firestore.collection("ff")
-                .document(preference.groupName?:"test")
+                .document(preference.groupName ?: "test")
                 .collection("stories")
                 .document(data.userId)
                 .update("cmtUserProfile", data.cmtUserProfile)
@@ -126,7 +127,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     status = false
                 }.await()
             Resource.Success(status)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -134,20 +135,20 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun getGroups(): Resource<List<SetGetGroupsName>> {
         return try {
-            var data  = mutableListOf<SetGetGroupsName>()
+            var data = mutableListOf<SetGetGroupsName>()
             val documents = firestore.collection("ff")
-                .document(preference.tableName?:"test")
+                .document(preference.tableName ?: "test")
                 .collection("groups")
                 .get()
                 .await()
-            for(document in documents.documents){
+            for (document in documents.documents) {
                 val item = document.toObject<SetGetGroupsName>()
                 item?.let {
                     data.add(it)
                 }
             }
             Resource.Success(data.sortedBy { it.groupName })
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -159,7 +160,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             firestore.collection("ff")
                 .document(data.groupAdmin)
                 .collection("groupsRequests")
-                .document(data.groupRequested)
+                .document(data.tableName)
                 .set(data)
                 .addOnSuccessListener {
                     status = true
@@ -167,7 +168,27 @@ class FirestoreRepositoryImpl @Inject constructor(
                     status = false
                 }.await()
             Resource.Success(status)
-        }catch (e: Exception){
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+    override suspend fun deleteRequestGroup(data: RequestGroupDeatails): Resource<Boolean> {
+        return try {
+            var status = true
+            firestore.collection("ff")
+                .document(preference.tableName?:"test")
+                .collection("groupsRequests")
+                .document(data.tableName)
+                .delete()
+                .addOnSuccessListener {
+                    status = true
+                }.addOnFailureListener {
+                    status = false
+                }.await()
+            Resource.Success(status)
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }
@@ -175,20 +196,20 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun getRequestGroup(): Resource<List<RequestGroupDeatails>> {
         return try {
-            var data  = mutableListOf<RequestGroupDeatails>()
+            var data = mutableListOf<RequestGroupDeatails>()
             val documents = firestore.collection("ff")
-                .document(preference.tableName?:"test")
+                .document(preference.tableName ?: "test")
                 .collection("groupsRequests")
                 .get()
                 .await()
-            for(document in documents.documents){
+            for (document in documents.documents) {
                 val item = document.toObject<RequestGroupDeatails>()
                 item?.let {
                     data.add(it)
                 }
             }
             Resource.Success(data.sortedBy { it.groupName })
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Resource.Failure(e)
         }

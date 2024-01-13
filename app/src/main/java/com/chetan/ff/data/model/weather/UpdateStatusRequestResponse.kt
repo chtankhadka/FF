@@ -8,5 +8,6 @@ data class UpdateStatusRequestResponse(
     val date: String = "",
     val weather: String = "",
     val group: String = "",
-    val userProfile: String = ""
+    val userProfile: String = "",
+    val oneSignalId: String = ""
 )

@@ -1,14 +1,15 @@
 package com.chetan.ff.presentation.dashboard
 
-import android.text.TextUtils.split
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chetan.ff.R
 import com.chetan.ff.data.Resource
 import com.chetan.ff.data.model.ImageStorageDetails
+import com.chetan.ff.data.model.PushNotificationRequest
 import com.chetan.ff.data.model.RequestGroupDeatails
 import com.chetan.ff.data.model.SetGetGroupsName
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
+import com.chetan.ff.data.repositoryImpl.OneSignalRepository
 import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.presentation.dialogs.Message
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val firestoreUseCases: FirestoreUseCases,
     private val fdbUseCases: FDBUseCases,
-    private val preference: Preference
+    private val preference: Preference,
+    private val oneSignalRepository: OneSignalRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(DashboardState())
     val state: StateFlow<DashboardState> = _state
@@ -184,6 +187,72 @@ class DashboardViewModel @Inject constructor(
                             }
                         }
                     }
+                }
+
+                is DashboardEvent.DeleteRequestGroup -> {
+                    val requestDelete = firestoreUseCases.deleteRequestGroup(data = RequestGroupDeatails(
+                        groupAdmin = event.data.groupAdmin,
+                        groupName = event.data.groupName,
+                        groupRequested = event.data.groupRequested,
+                        tableName =event.data.tableName
+                    ))
+                    when(requestDelete){
+                        is Resource.Failure -> {
+
+                        }
+                        Resource.Loading -> {
+
+                        }
+                        is Resource.Success -> {
+                            _state.update {
+                                it.copy(
+                                    groupRequestList = _state.value.groupRequestList.filterNot { it.tableName == event.data.tableName }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                DashboardEvent.GetStatusNow -> {
+                    val oneSignalList = firestoreUseCases.getStatus()
+                    when(oneSignalList){
+                        is Resource.Failure -> {
+
+                        }
+                        Resource.Loading -> {
+
+                        }
+                        is Resource.Success -> {
+                            try {
+                                val sendNotice = oneSignalRepository.pushNotification(
+                                    PushNotificationRequest(
+                                        contents = mapOf("en" to "Want your Status"),
+                                        headings = mapOf("en" to preference.userName.toString()),
+                                        include_player_ids = oneSignalList.data.map { it.oneSignalId }
+                                    )
+                                )
+                                when (sendNotice) {
+                                    is Resource.Failure -> {
+
+                                    }
+
+                                    Resource.Loading -> {
+
+                                    }
+
+                                    is Resource.Success -> {
+
+                                    }
+                                }
+                            } catch (e: HttpException) {
+
+                                e.printStackTrace()
+                            } catch (e: Throwable) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+
                 }
             }
         }

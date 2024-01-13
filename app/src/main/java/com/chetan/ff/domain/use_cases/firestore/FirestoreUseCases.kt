@@ -9,5 +9,6 @@ data class FirestoreUseCases(
     val setGroup: SetGroup,
     val getGroups: GetGroups,
     val requestGroup: RequestGroup,
-    val getRequestGroup: GetRequestGroup
+    val getRequestGroup: GetRequestGroup,
+    val deleteRequestGroup: DeleteRequestGroup
 )

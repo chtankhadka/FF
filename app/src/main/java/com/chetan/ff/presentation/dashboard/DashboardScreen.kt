@@ -239,7 +239,8 @@ fun DashboardScreen(
                         }
 
                         MenuItem.RequestStatus -> {
-
+                            onEvent(DashboardEvent.GetStatusNow)
+                            Toast.makeText(context,"Getting Status",Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
@@ -573,7 +574,7 @@ fun DashboardScreen(
                                 }
 
                                 IconButton(onClick = {
-
+                                    onEvent(DashboardEvent.DeleteRequestGroup(data))
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,

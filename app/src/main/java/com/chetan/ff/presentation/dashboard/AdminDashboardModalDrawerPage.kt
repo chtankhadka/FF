@@ -47,9 +47,6 @@ fun AdminDashboardModalDrawerPage(
     state: DashboardState,
     groupSelected: (String) -> Unit,
 ) {
-    val menuList = listOf(
-        MenuItem.SendNotice,
-    )
     val bottomMenuItem = listOf(
         MenuItem.Logout
     )
@@ -125,7 +122,7 @@ fun AdminDashboardModalDrawerPage(
                 items(state.groupList) {
                     Card(
                         modifier = Modifier
-                            .height(100.dp)
+                            .height(60.dp)
                             .fillMaxWidth()
                             .clickable{
                                 groupSelected(it.groupName)
@@ -136,7 +133,9 @@ fun AdminDashboardModalDrawerPage(
                             )
                         )
                     ) {
-                        Text(text = it.groupName, style = TextStyle(
+                        Text(
+                            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
+                            text = it.groupName, style = TextStyle(
                             fontWeight = FontWeight.Bold
                         ))
                         Text(text = it.groupCreated)
