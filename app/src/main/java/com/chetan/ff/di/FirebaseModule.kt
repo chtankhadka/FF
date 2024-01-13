@@ -11,8 +11,10 @@ import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
 import com.chetan.ff.domain.use_cases.fdb.InsertImage
 import com.chetan.ff.domain.use_cases.firestore.FirestoreUseCases
 import com.chetan.ff.domain.use_cases.firestore.GetGroups
+import com.chetan.ff.domain.use_cases.firestore.GetRequestGroup
 import com.chetan.ff.domain.use_cases.firestore.GetStatus
 import com.chetan.ff.domain.use_cases.firestore.GetStories
+import com.chetan.ff.domain.use_cases.firestore.RequestGroup
 import com.chetan.ff.domain.use_cases.firestore.SetGroup
 import com.chetan.ff.domain.use_cases.firestore.SetStories
 import com.chetan.ff.domain.use_cases.firestore.UpdateCommentedUserInStories
@@ -83,7 +85,9 @@ object FirebaseModule {
             getStories = GetStories(frepository = repository),
             updateCommentedUserInStories = UpdateCommentedUserInStories(frepository = repository),
             getGroups = GetGroups(frepository = repository),
-            setGroup = SetGroup(frepository = repository)
+            setGroup = SetGroup(frepository = repository),
+            requestGroup = RequestGroup(frepository = repository),
+            getRequestGroup = GetRequestGroup(frepository = repository)
         )
 
 

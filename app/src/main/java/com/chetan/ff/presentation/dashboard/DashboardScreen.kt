@@ -17,9 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
 import androidx.compose.material.icons.filled.LibraryMusic
@@ -191,67 +195,16 @@ fun DashboardScreen(
     var showCreateGroupDialog by remember {
         mutableStateOf(false)
     }
-    if (showCreateGroupDialog) {
-        Dialog(onDismissRequest = {
 
-        }
-        ) {
-            val ctx = LocalContext.current
-            Column(
-                Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Create Your Group",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                LoadLottieAnimation(
-                    modifier = Modifier.size(200.dp),
-                    image = R.raw.groups
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = state.onChangeGroupName,
-                    onValueChange = {
-                        onEvent(DashboardEvent.OnGroupNameChange(it))
-                    },
-                    label = {
-                        Text("Group Name")
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
-                        .also { Arrangement.Center }) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = state.onChangeGroupName.isNotBlank(),
-                        onClick = {
-                            onEvent(DashboardEvent.SetGroupName(state.onChangeGroupName))
-                        }) {
-                        Text(text = "Create")
-                    }
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
-                        onClick = {
-                            showCreateGroupDialog = false
-                        }) {
-                        Text(text = "Cancel")
-                    }
-                }
-
-            }
-        }
+    var showJoinGroupDialog by remember {
+        mutableStateOf(false)
     }
+    var showRequestGroupDialog by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(key1 = state.groupName, block = {
-        if (state.groupName.isNotBlank()){
+        if (state.groupName.isNotBlank()) {
             onAction(ApplicationAction.Restart)
         }
     })
@@ -278,19 +231,24 @@ fun DashboardScreen(
                         }
 
                         MenuItem.GroupRequest -> {
-
+                            showRequestGroupDialog = true
                         }
 
                         MenuItem.JoinGroup -> {
-
+                            showJoinGroupDialog = true
                         }
 
                         MenuItem.RequestStatus -> {
 
                         }
                     }
-                })
-        }) {
+                },
+                groupSelected = {
+                    onEvent(DashboardEvent.ChangeMyGroup(it))
+                }
+            )
+        })
+    {
         Scaffold(
             containerColor = Color.Transparent,
             bottomBar = {
@@ -418,6 +376,233 @@ fun DashboardScreen(
 
             }
 
+        }
+    }
+
+    if (showCreateGroupDialog) {
+        Dialog(onDismissRequest = {
+
+        }
+        ) {
+            val ctx = LocalContext.current
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Create Your Group",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                LoadLottieAnimation(
+                    modifier = Modifier.size(200.dp),
+                    image = R.raw.groups
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = state.onChangeGroupName,
+                    onValueChange = {
+                        onEvent(DashboardEvent.OnGroupNameChange(it))
+                    },
+                    label = {
+                        Text("Group Name")
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        .also { Arrangement.Center }) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = state.onChangeGroupName.isNotBlank(),
+                        onClick = {
+                            onEvent(DashboardEvent.SetGroupName(state.onChangeGroupName))
+                        }) {
+                        Text(text = "Create")
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                        onClick = {
+                            showCreateGroupDialog = false
+                        }) {
+                        Text(text = "Cancel")
+                    }
+                }
+
+            }
+        }
+    }
+
+    if (showJoinGroupDialog) {
+        Dialog(onDismissRequest = {
+
+        }
+        ) {
+            val ctx = LocalContext.current
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = "Join Group",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = state.onChangeAdminGmail,
+                    onValueChange = {
+                        onEvent(DashboardEvent.OnChangeAdminGmail(it))
+                    },
+                    label = {
+                        if (state.onChangeAdminGmail.isBlank()) {
+                            Text("Admin Gmail")
+                        } else {
+                            if (state.onChangeAdminGmail.contains("@")) {
+                                Text("Admin Gmail")
+                            } else {
+                                Text(
+                                    text = "Invalid Gmail",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+
+
+                    }
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+
+                OutlinedTextField(
+                    value = state.onChangeGroupName,
+                    onValueChange = {
+                        onEvent(DashboardEvent.OnGroupNameChange(it))
+                    },
+                    label = {
+                        Text("Group Name")
+                    }
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        .also { Arrangement.Center }) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = state.onChangeGroupName.isNotBlank() && state.onChangeAdminGmail.contains(
+                            "@"
+                        ),
+                        onClick = {
+                            onEvent(
+                                DashboardEvent.SendGroupRequest(
+                                    state.onChangeAdminGmail,
+                                    state.onChangeGroupName
+                                )
+                            )
+                            showJoinGroupDialog = false
+                        }) {
+                        Text(text = "Request")
+                    }
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                        onClick = {
+                            showJoinGroupDialog = false
+                        }) {
+                        Text(text = "Cancel")
+                    }
+                }
+
+            }
+        }
+    }
+
+    if (showRequestGroupDialog) {
+        Dialog(onDismissRequest = {
+            showRequestGroupDialog = false
+        }
+        ) {
+            val ctx = LocalContext.current
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = "Requests",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                state.groupRequestList.forEach {data ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(text = data.groupName, fontWeight = FontWeight.Bold)
+                                Text(text = data.groupRequested)
+                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                IconButton(onClick = {
+                                    onEvent(DashboardEvent.AcceptGroupRequest(data))
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = "done"
+                                    )
+                                }
+
+                                IconButton(onClick = {
+
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "delete"
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+
+
+
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        .also { Arrangement.Center }) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            showRequestGroupDialog = false
+                        }) {
+                        Text(text = "Done")
+                    }
+                }
+
+            }
         }
     }
 

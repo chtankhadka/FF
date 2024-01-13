@@ -1,6 +1,7 @@
 package com.chetan.ff.data.repositoryImpl
 
 import com.chetan.ff.data.Resource
+import com.chetan.ff.data.model.RequestGroupDeatails
 import com.chetan.ff.data.model.SetGetGroupsName
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
@@ -115,7 +116,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             var status = true
             firestore.collection("ff")
-                .document(preference.tableName?:"test")
+                .document(data.tableName)
                 .collection("groups")
                 .document(data.groupName)
                 .set(data)
@@ -152,6 +153,46 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun requestGroup(data: RequestGroupDeatails): Resource<Boolean> {
+        return try {
+            var status = true
+            firestore.collection("ff")
+                .document(data.groupAdmin)
+                .collection("groupsRequests")
+                .document(data.groupRequested)
+                .set(data)
+                .addOnSuccessListener {
+                    status = true
+                }.addOnFailureListener {
+                    status = false
+                }.await()
+            Resource.Success(status)
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
+
+    override suspend fun getRequestGroup(): Resource<List<RequestGroupDeatails>> {
+        return try {
+            var data  = mutableListOf<RequestGroupDeatails>()
+            val documents = firestore.collection("ff")
+                .document(preference.tableName?:"test")
+                .collection("groupsRequests")
+                .get()
+                .await()
+            for(document in documents.documents){
+                val item = document.toObject<RequestGroupDeatails>()
+                item?.let {
+                    data.add(it)
+                }
+            }
+            Resource.Success(data.sortedBy { it.groupName })
+        }catch (e: Exception){
+            e.printStackTrace()
+            Resource.Failure(e)
+        }
+    }
 
 
 }

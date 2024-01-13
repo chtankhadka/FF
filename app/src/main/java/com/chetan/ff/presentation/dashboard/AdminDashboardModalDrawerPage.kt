@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 fun AdminDashboardModalDrawerPage(
     onClick: (MenuItem) -> Unit,
     state: DashboardState,
+    groupSelected: (String) -> Unit,
 ) {
     val menuList = listOf(
         MenuItem.SendNotice,
@@ -54,7 +55,6 @@ fun AdminDashboardModalDrawerPage(
     )
 
     val requestMenuItem = listOf(
-        MenuItem.GroupRequest,
         MenuItem.RequestStatus
     )
     Column(
@@ -81,19 +81,19 @@ fun AdminDashboardModalDrawerPage(
                     onClick(MenuItem.CreateGroup)
                 }) {
                     Icon(
-                        imageVector = Icons.Default.GroupAdd,
+                        imageVector = Icons.Default.Create,
                         contentDescription = "Create Group",
                     )
                 }
                 IconButton(onClick = { onClick(MenuItem.JoinGroup) }) {
                     Icon(
-                        imageVector = Icons.Default.Create,
+                        imageVector = Icons.Default.GroupAdd,
                         contentDescription = "Join Group",
                     )
                 }
                 IconButton(onClick = { onClick(MenuItem.GroupRequest) }) {
                     Icon(
-                        imageVector = Icons.Default.NotificationsActive,
+                        imageVector = if (state.groupRequestList.isEmpty()) Icons.Default.NotificationsActive else Icons.Default.NotificationAdd,
                         contentDescription = "Request",
                     )
                 }
@@ -107,7 +107,7 @@ fun AdminDashboardModalDrawerPage(
                     .width(50.dp)
             ) {
             requestMenuItem.forEach {
-                IconButton(onClick = { onClick(MenuItem.JoinGroup) }) {
+                IconButton(onClick = { onClick(it) }) {
                     Icon(
                         imageVector = it.icon,
                         contentDescription = it.label,
@@ -126,7 +126,10 @@ fun AdminDashboardModalDrawerPage(
                     Card(
                         modifier = Modifier
                             .height(100.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .clickable{
+                                groupSelected(it.groupName)
+                            },
                         colors = CardDefaults.cardColors(
                             MaterialTheme.colorScheme.surfaceVariant.copy(
                                 alpha = 0.8f

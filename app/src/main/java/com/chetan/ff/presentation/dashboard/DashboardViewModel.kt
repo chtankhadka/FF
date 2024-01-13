@@ -1,10 +1,12 @@
 package com.chetan.ff.presentation.dashboard
 
+import android.text.TextUtils.split
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chetan.ff.R
 import com.chetan.ff.data.Resource
 import com.chetan.ff.data.model.ImageStorageDetails
+import com.chetan.ff.data.model.RequestGroupDeatails
 import com.chetan.ff.data.model.SetGetGroupsName
 import com.chetan.ff.data.model.StoriesDetailRequestResponse
 import com.chetan.ff.domain.use_cases.fdb.FDBUseCases
@@ -27,9 +29,9 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(DashboardState())
     val state: StateFlow<DashboardState> = _state
-
     init {
         getGroups()
+        getRequestGroups()
     }
 
     val onEvent: (event: DashboardEvent) -> Unit = { event ->
@@ -100,6 +102,7 @@ class DashboardViewModel @Inject constructor(
                         data = SetGetGroupsName(
                             groupName = event.value,
                             groupCreated = preference.userName ?: "test",
+                            tableName = preference.tableName?:"test",
                             createdTime = LocalDateTime.now().toString()
                         )
                     )
@@ -130,6 +133,58 @@ class DashboardViewModel @Inject constructor(
                         )
                     }
                 }
+
+                is DashboardEvent.OnChangeAdminGmail -> {
+                    _state.update {
+                        it.copy(
+                            onChangeAdminGmail = event.value
+                        )
+                    }
+                }
+                is DashboardEvent.SendGroupRequest -> {
+                    firestoreUseCases.requestGroup(data = RequestGroupDeatails(
+                        groupAdmin = event.groupAdmin.split("@").get(0).replace(Regex("[^A-Za-z0-9 ]"), ""),
+                        groupName = event.groupName,
+                        tableName = preference.tableName?:"test",
+                        groupRequested = preference.userName?:"test"
+                    ))
+                }
+
+                is DashboardEvent.ChangeMyGroup -> {
+                    preference.groupName = event.value
+                    _state.update {
+                        it.copy(
+                            groupName = event.value
+                        )
+                    }
+                }
+
+                is DashboardEvent.AcceptGroupRequest -> {
+                    val groupCreated = firestoreUseCases.setGroup(
+                            data = SetGetGroupsName(
+                                groupName = event.data.groupName,
+                                groupCreated = event.data.groupAdmin,
+                                tableName = event.data.tableName,
+                                createdTime = LocalDateTime.now().toString()
+                            )
+                            )
+                    when(groupCreated){
+                        is Resource.Failure -> {
+
+                        }
+                        Resource.Loading -> {
+
+                        }
+                        is Resource.Success -> {
+
+                            _state.update {
+                                it.copy(
+                                    groupRequestList = _state.value.groupRequestList.filterNot { it.tableName == event.data.tableName }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -150,6 +205,30 @@ class DashboardViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             groupList = groupsName.data
+                        )
+                    }
+                }
+            }
+        }
+
+
+    }
+    fun getRequestGroups() {
+        viewModelScope.launch {
+            val groupsName = firestoreUseCases.getRequestGroup()
+            when (groupsName) {
+                is Resource.Failure -> {
+
+                }
+
+                Resource.Loading -> {
+
+                }
+
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            groupRequestList = groupsName.data
                         )
                     }
                 }
