@@ -9,5 +9,7 @@ data class UpdateStatusRequestResponse(
     val weather: String = "",
     val group: String = "",
     val userProfile: String = "",
-    val oneSignalId: String = ""
+    val oneSignalId: String = "",
+    val audioProfile: String = "",
+    val batteryLife: String = ""
 )

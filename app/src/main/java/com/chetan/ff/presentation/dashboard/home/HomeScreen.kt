@@ -5,7 +5,10 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.LocationManager
+import android.media.AudioManager
+import android.os.BatteryManager
 import android.provider.Settings
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -27,8 +30,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.DoNotDisturbOnTotalSilence
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.MusicOff
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -89,6 +98,10 @@ fun HomeScreen(
     //location
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val batteryIntent: Intent? = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
+
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 //    if (isGpsEnabled)
@@ -114,6 +127,11 @@ fun HomeScreen(
     }
     LaunchedEffect(key1 = canOrder, block = {
         if (canOrder) {
+            val level: Int = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)?:-1
+            val scale: Int = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+
+            val batteryPercentage = (level / scale.toFloat() * 100).toInt().toString()
+            event(HomeEvent.AudioProfile(audioManager.ringerMode.toString(),"$batteryPercentage%"))
             scope.launch(Dispatchers.IO) {
                 val locationClient =
                     LocationServices.getFusedLocationProviderClient(context)
@@ -134,6 +152,8 @@ fun HomeScreen(
             }
         }
     })
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -280,6 +300,7 @@ fun HomeScreen(
                                     .align(Alignment.TopEnd), image = R.raw.thunder
                             )
                         }
+
                         "Mist" -> {
                             LoadLottieAnimation(
                                 modifier = Modifier
@@ -412,6 +433,28 @@ fun WeatherItem(position: Int, pagerState: Int, info: List<UpdateStatusRequestRe
                     )
                 )
             )
+            Icon(
+                modifier = Modifier.padding(start = 5.dp),
+                imageVector = Icons.Filled.BatteryAlert, contentDescription = "")
+            Text( modifier = Modifier.padding(end = 5.dp),text = info[position].batteryLife)
+            when(info[position].audioProfile){
+                "0" ->{
+                    Icon(imageVector = Icons.Filled.MusicOff, contentDescription = "")
+                }
+                "1" ->{
+                    Icon(imageVector = Icons.Filled.Vibration, contentDescription = "")
+
+                }
+                "2" ->{
+                    Icon(imageVector = Icons.Filled.MusicNote, contentDescription = "")
+
+                }
+                else ->{
+
+                }
+            }
+
+
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(

@@ -2,7 +2,11 @@ package com.chetan.ff.service
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.location.LocationManager
+import android.media.AudioManager
+import android.os.BatteryManager
 import com.chetan.ff.data.model.weather.UpdateStatusRequestResponse
 import com.chetan.ff.di.HiltEntryPoint
 import com.chetan.orderdelivery.data.local.Preference
@@ -31,6 +35,9 @@ class NotificationServiceExtension
         preference = Preference(event.context)
         if (event.notification.body != null) {
             try {
+                val audioManager = event.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val batteryIntent: Intent? = event.context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
                 val locationManager =
                     event.context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -51,6 +58,10 @@ class NotificationServiceExtension
                                 CancellationTokenSource().token
                             )
                                 .await()
+                        val level: Int = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)?:-1
+                        val scale: Int = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+
+                        val batteryPercentage = (level / scale.toFloat() * 100).toInt().toString()
                         delay(1000)
                         println(locResult)
                         locResult?.let { currentLocation ->
@@ -73,7 +84,9 @@ class NotificationServiceExtension
                                     weather = result.weather.first().main,
                                     group = preference.groupName ?: "test",
                                     userProfile = preference.gmailProfile ?: "",
-                                    oneSignalId = OneSignal.User.pushSubscription.id
+                                    oneSignalId = OneSignal.User.pushSubscription.id,
+                                    audioProfile = audioManager.ringerMode.toString(),
+                                    batteryLife = "$batteryPercentage%"
                                 )
                             )
 

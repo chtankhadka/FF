@@ -15,5 +15,7 @@ data class HomeState(
     ),
     val ffLocations: List<UpdateStatusRequestResponse> = emptyList(),
     val stories : List<StoriesDetailRequestResponse> = emptyList(),
-    val myProfile: String = ""
+    val myProfile: String = "",
+    val audioProfile: String = "",
+    val battery: String = ""
 )

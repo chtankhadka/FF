@@ -3,6 +3,7 @@ package com.chetan.ff.presentation.dashboard.home
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chetan.ff.data.Resource
@@ -64,7 +65,9 @@ class HomeViewModel @Inject constructor(
                             weather = result.weather.first().main,
                             group = preference.groupName?:"test",
                             userProfile = preference.gmailProfile?:"",
-                            oneSignalId = OneSignal.User.pushSubscription.id
+                            oneSignalId = OneSignal.User.pushSubscription.id,
+                            audioProfile = state.value.audioProfile,
+                            batteryLife = state.value.battery
                         ))
                         when(updateWeather){
                             is Resource.Failure -> {
@@ -79,6 +82,15 @@ class HomeViewModel @Inject constructor(
                             }
                         }
 
+                    }
+
+                    is HomeEvent.AudioProfile -> {
+                        _state.update {
+                            it.copy(
+                                audioProfile = event.audio,
+                                battery = event.battery
+                            )
+                        }
                     }
                 }
             }

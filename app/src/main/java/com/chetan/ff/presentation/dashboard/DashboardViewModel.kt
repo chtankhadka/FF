@@ -248,7 +248,7 @@ class DashboardViewModel @Inject constructor(
                             try {
                                 val sendNotice = oneSignalRepository.pushNotification(
                                     PushNotificationRequest(
-                                        contents = mapOf("en" to "Want your Status"),
+                                        contents = mapOf("en" to "Wants your Status"),
                                         headings = mapOf("en" to preference.userName.toString()),
                                         include_player_ids = oneSignalList.data.map { it.oneSignalId }
                                     )
