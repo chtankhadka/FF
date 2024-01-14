@@ -51,7 +51,8 @@ class NotificationServiceExtension
                                 CancellationTokenSource().token
                             )
                                 .await()
-                        delay(2000)
+                        delay(1000)
+                        println(locResult)
                         locResult?.let { currentLocation ->
                             val result = weatherRepository.getCurrentLocationKey(
                                 currentLocation.latitude.toString(),

@@ -549,6 +549,7 @@ fun DashboardScreen(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 state.groupRequestList.forEach {data ->
+                    Spacer(modifier = Modifier.height(5.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(10.dp)

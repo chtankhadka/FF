@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,10 +23,10 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.RemoveRedEye
+import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,10 +35,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -59,17 +61,28 @@ fun AdminDashboardModalDrawerPage(
             .fillMaxWidth(0.5f)
             .fillMaxHeight()
             .background(
-                color = Color.Transparent,
-                shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
+                brush = Brush.verticalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.primary
+                    )
+                ),
+                shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
+                alpha = 0.5f
             ),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Card(
-//            modifier =Modifier.padding(5.dp),
+            modifier = Modifier.padding(5.dp),
             shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
             elevation = CardDefaults.cardElevation(10.dp)
         ) {
-            Text(text = "Groups")
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Group Activities",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
@@ -100,33 +113,43 @@ fun AdminDashboardModalDrawerPage(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .width(50.dp)
+                    .padding(horizontal = 5.dp)
             ) {
-            requestMenuItem.forEach {
-                IconButton(onClick = { onClick(it) }) {
-                    Icon(
-                        imageVector = it.icon,
-                        contentDescription = it.label,
-                    )
+                requestMenuItem.forEach {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Card(
+                        modifier = Modifier.clickable {
+                            onClick(it)
+                        },
+                        elevation = CardDefaults.cardElevation(10.dp)
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(4.dp),
+                            imageVector = it.icon,
+                            contentDescription = it.label,
+                        )
+                    }
+
                 }
-            }
 
             }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(if (state.groupList.isEmpty()) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent),
-                contentPadding = PaddingValues(10.dp)
+                contentPadding = PaddingValues(5.dp)
             ) {
                 items(state.groupList) {
                     Card(
                         modifier = Modifier
                             .height(60.dp)
                             .fillMaxWidth()
-                            .clickable{
+                            .clickable {
                                 groupSelected(it.groupName)
                             },
+                        elevation = CardDefaults.cardElevation(10.dp),
                         colors = CardDefaults.cardColors(
                             MaterialTheme.colorScheme.surfaceVariant.copy(
                                 alpha = 0.8f
@@ -136,8 +159,9 @@ fun AdminDashboardModalDrawerPage(
                         Text(
                             modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
                             text = it.groupName, style = TextStyle(
-                            fontWeight = FontWeight.Bold
-                        ))
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
                         Text(text = it.groupCreated)
                     }
                     Spacer(modifier = Modifier.height(10.dp))
@@ -146,10 +170,10 @@ fun AdminDashboardModalDrawerPage(
 
 
         }
-        Divider()
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(5.dp),
             shape = RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp),
             elevation = CardDefaults.cardElevation(10.dp)
         ) {
@@ -163,7 +187,9 @@ fun AdminDashboardModalDrawerPage(
                     elevation = CardDefaults.cardElevation(10.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -190,7 +216,7 @@ fun AdminDashboardModalDrawerPage(
 
 sealed class MenuItem(val icon: ImageVector, val label: String) {
     data object SendNotice : MenuItem(icon = Icons.Default.NotificationAdd, label = "Send Notice")
-    data object RequestStatus : MenuItem(icon = Icons.Default.QueryStats, label = "Request Status")
+    data object RequestStatus : MenuItem(icon = Icons.Default.RemoveRedEye, label = "Request Status")
     data object Logout : MenuItem(icon = Icons.Default.Logout, label = "LogOut")
     data object CreateGroup : MenuItem(icon = Icons.Default.Create, label = "Create Group")
     data object JoinGroup : MenuItem(icon = Icons.Default.Create, label = "Join Group")

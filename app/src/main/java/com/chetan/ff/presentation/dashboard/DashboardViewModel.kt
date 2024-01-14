@@ -32,6 +32,7 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(DashboardState())
     val state: StateFlow<DashboardState> = _state
+
     init {
         getGroups()
         getRequestGroups()
@@ -105,17 +106,19 @@ class DashboardViewModel @Inject constructor(
                         data = SetGetGroupsName(
                             groupName = event.value,
                             groupCreated = preference.userName ?: "test",
-                            tableName = preference.tableName?:"test",
+                            tableName = preference.tableName ?: "test",
                             createdTime = LocalDateTime.now().toString()
                         )
                     )
-                    when(groupCreated){
+                    when (groupCreated) {
                         is Resource.Failure -> {
 
                         }
+
                         Resource.Loading -> {
 
                         }
+
                         is Resource.Success -> {
                             preference.groupName = event.value
                             _state.update {
@@ -144,13 +147,17 @@ class DashboardViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is DashboardEvent.SendGroupRequest -> {
-                    firestoreUseCases.requestGroup(data = RequestGroupDeatails(
-                        groupAdmin = event.groupAdmin.split("@").get(0).replace(Regex("[^A-Za-z0-9 ]"), ""),
-                        groupName = event.groupName,
-                        tableName = preference.tableName?:"test",
-                        groupRequested = preference.userName?:"test"
-                    ))
+                    firestoreUseCases.requestGroup(
+                        data = RequestGroupDeatails(
+                            groupAdmin = event.groupAdmin.split("@").get(0)
+                                .replace(Regex("[^A-Za-z0-9 ]"), ""),
+                            groupName = event.groupName,
+                            tableName = preference.tableName ?: "test",
+                            groupRequested = preference.userName ?: "test"
+                        )
+                    )
                 }
 
                 is DashboardEvent.ChangeMyGroup -> {
@@ -164,22 +171,31 @@ class DashboardViewModel @Inject constructor(
 
                 is DashboardEvent.AcceptGroupRequest -> {
                     val groupCreated = firestoreUseCases.setGroup(
-                            data = SetGetGroupsName(
-                                groupName = event.data.groupName,
-                                groupCreated = event.data.groupAdmin,
-                                tableName = event.data.tableName,
-                                createdTime = LocalDateTime.now().toString()
-                            )
-                            )
-                    when(groupCreated){
+                        data = SetGetGroupsName(
+                            groupName = event.data.groupName,
+                            groupCreated = event.data.groupAdmin,
+                            tableName = event.data.tableName,
+                            createdTime = LocalDateTime.now().toString()
+                        )
+                    )
+                    when (groupCreated) {
                         is Resource.Failure -> {
 
                         }
+
                         Resource.Loading -> {
 
                         }
-                        is Resource.Success -> {
 
+                        is Resource.Success -> {
+                            firestoreUseCases.deleteRequestGroup(
+                                data = RequestGroupDeatails(
+                                    groupAdmin = event.data.groupAdmin,
+                                    groupName = event.data.groupName,
+                                    groupRequested = event.data.groupRequested,
+                                    tableName = event.data.tableName
+                                )
+                            )
                             _state.update {
                                 it.copy(
                                     groupRequestList = _state.value.groupRequestList.filterNot { it.tableName == event.data.tableName }
@@ -190,19 +206,23 @@ class DashboardViewModel @Inject constructor(
                 }
 
                 is DashboardEvent.DeleteRequestGroup -> {
-                    val requestDelete = firestoreUseCases.deleteRequestGroup(data = RequestGroupDeatails(
-                        groupAdmin = event.data.groupAdmin,
-                        groupName = event.data.groupName,
-                        groupRequested = event.data.groupRequested,
-                        tableName =event.data.tableName
-                    ))
-                    when(requestDelete){
+                    val requestDelete = firestoreUseCases.deleteRequestGroup(
+                        data = RequestGroupDeatails(
+                            groupAdmin = event.data.groupAdmin,
+                            groupName = event.data.groupName,
+                            groupRequested = event.data.groupRequested,
+                            tableName = event.data.tableName
+                        )
+                    )
+                    when (requestDelete) {
                         is Resource.Failure -> {
 
                         }
+
                         Resource.Loading -> {
 
                         }
+
                         is Resource.Success -> {
                             _state.update {
                                 it.copy(
@@ -215,13 +235,15 @@ class DashboardViewModel @Inject constructor(
 
                 DashboardEvent.GetStatusNow -> {
                     val oneSignalList = firestoreUseCases.getStatus()
-                    when(oneSignalList){
+                    when (oneSignalList) {
                         is Resource.Failure -> {
 
                         }
+
                         Resource.Loading -> {
 
                         }
+
                         is Resource.Success -> {
                             try {
                                 val sendNotice = oneSignalRepository.pushNotification(
@@ -282,6 +304,7 @@ class DashboardViewModel @Inject constructor(
 
 
     }
+
     fun getRequestGroups() {
         viewModelScope.launch {
             val groupsName = firestoreUseCases.getRequestGroup()

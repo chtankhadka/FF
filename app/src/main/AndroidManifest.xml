@@ -34,6 +34,7 @@
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE" />
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyALyw4tmaz5WjembICjB1yHP-eYE94YrOA"/>
     </application>
 
 </manifest>
