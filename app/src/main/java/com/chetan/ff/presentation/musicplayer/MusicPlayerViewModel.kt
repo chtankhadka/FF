@@ -2,13 +2,11 @@ package com.chetan.ff.presentation.musicplayer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
+import androidx.media3.exoplayer.ExoPlayer
 import com.chetan.ff.domain.repository.AudioRepository
 import com.chetan.ff.service.AudioServiceHandler
 import com.chetan.ff.service.AudioState
 import com.chetan.ff.service.PlayerEvent
-import com.chetan.orderdelivery.data.local.Preference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,23 +21,28 @@ import javax.inject.Inject
 class MusicPlayerViewModel @Inject constructor(
     private val audioServiceHandler: AudioServiceHandler,
     private val repository: AudioRepository,
-    private val preference: Preference
+    private val exoPlayer: ExoPlayer
 ) : ViewModel() {
     private val _state = MutableStateFlow(MusicPlayerState())
     val state: StateFlow<MusicPlayerState> = _state
 
     init {
         loadAudioData()
-
+        _state.update {
+            it.copy(
+                isPlaying = exoPlayer.isPlaying,
+                duration = exoPlayer.duration,
+            )
+        }
+        calculateProgressValue(exoPlayer.currentPosition)
     }
 
     init {
         viewModelScope.launch {
             audioServiceHandler.audioState.collectLatest { mediaState ->
-
                 when (mediaState) {
                     is AudioState.Buffering ->{
-                        calculateProgressValue(mediaState.progress)
+
                     }
                     is AudioState.CurrentPlaying -> {
                         _state.update {
@@ -60,7 +63,8 @@ class MusicPlayerViewModel @Inject constructor(
                     is AudioState.Playing -> {
                         _state.update {
                             it.copy(
-                                isPlaying = mediaState.isPlaying
+                                isPlaying = exoPlayer.isPlaying,
+                                currentSelectedAudio = _state.value.audioList[exoPlayer.currentMediaItemIndex]
                             )
                         }
                     }
@@ -85,27 +89,10 @@ class MusicPlayerViewModel @Inject constructor(
             val audio = repository.getAudioData()
             _state.update {
                 it.copy(
+                    currentSelectedAudio = audio[exoPlayer.currentMediaItemIndex],
                     audioList = audio
                 )
             }
-            setMediaItems()
-        }
-    }
-
-    private fun setMediaItems() {
-        state.value.audioList.map { audio ->
-            MediaItem.Builder()
-                .setUri(audio.uri)
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setAlbumArtist(audio.artist)
-                        .setDisplayTitle(audio.title)
-                        .setSubtitle(audio.displayName)
-                        .build()
-                )
-                .build()
-        }.also {
-            audioServiceHandler.setMediaItemList(it)
         }
     }
 
@@ -113,17 +100,17 @@ class MusicPlayerViewModel @Inject constructor(
         _state.update {
             it.copy(
                 progress =
-                if (currentProgress > 0) ((currentProgress.toFloat() / state.value.duration.toFloat()) * 100f) else 0f,
-                progressString = formatDuration(currentProgress)
-            )
+                if (currentProgress > 0) (currentProgress.toFloat() / _state.value.duration.toFloat()) * 100f else 0f,
+                progressString = formatDuration(currentProgress)         )
         }
 
     }
 
-    fun formatDuration(duration: Long): String {
+    private fun formatDuration(duration: Long): String {
         val minute = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
-        val second = (minute) - minute * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
-        return String.format("%02d:&02d", minute, second)
+        val second =
+        TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS) - TimeUnit.MINUTES.toSeconds(minute)
+        return String.format("%02d:%02d", minute, second)
     }
 
     val onEvent: (event: MusicPlayerEvent) -> Unit = { event ->
@@ -175,6 +162,11 @@ class MusicPlayerViewModel @Inject constructor(
                     audioServiceHandler.onPlayerEvents(
                         PlayerEvent.UpdateProgress(event.newProgress)
                     )
+                    _state.update {
+                        it.copy(
+                            progress = event.newProgress
+                        )
+                    }
                 }
             }
         }

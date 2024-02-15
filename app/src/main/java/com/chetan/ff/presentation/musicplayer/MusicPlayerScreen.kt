@@ -1,6 +1,9 @@
 package com.chetan.ff.presentation.musicplayer
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.FastForward
-import androidx.compose.material.icons.filled.FastRewind
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
@@ -44,28 +45,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.chetan.ff.data.local.model.Audio
+import com.chetan.ff.presentation.dashboard.library.LibraryEvent
+import com.chetan.ff.presentation.dashboard.library.LibraryState
+import kotlin.math.floor
 
 data class Message(val text: String, val isFlagged: Boolean)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicPlayerScreen(
     nav: NavHostController,
-    onStart: (Int) -> Unit,
+    onStart: () -> Unit,
     event: (event: MusicPlayerEvent) -> Unit,
     state: MusicPlayerState
 ) {
@@ -78,9 +81,6 @@ fun MusicPlayerScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        var slider by remember {
-            mutableFloatStateOf(0.6f)
-        }
         var showCmt by remember {
             mutableStateOf(false)
         }
@@ -147,13 +147,11 @@ fun MusicPlayerScreen(
             if (!showCmt) {
                 Spacer(modifier = Modifier.height(15.dp))
                 Card(
-                    modifier = Modifier
-                        .size(250.dp)
-                        .padding(3.dp),
                     shape = CircleShape,
-                    elevation = CardDefaults.cardElevation(20.dp)
+                    elevation = CardDefaults.cardElevation(10.dp)
                 ) {
                     AsyncImage(
+                        modifier = Modifier.size(250.dp),
                         model = state.currentSelectedAudio.albumArtUri,
                         contentDescription = "",
                         contentScale = ContentScale.Crop
@@ -164,26 +162,29 @@ fun MusicPlayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontSize = 30.sp,
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            modifier = Modifier.basicMarquee(),
+                            text = state.currentSelectedAudio.displayName,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = TextStyle(
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                            )
-                        ) {
-                            append(state.currentSelectedAudio.title)
-                        }
-
-                        withStyle(
-                            style = SpanStyle(
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = state.currentSelectedAudio.artist,
+                            style = TextStyle(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                        ) {
-                            append("\n${state.currentSelectedAudio.artist}")
-                        }
-                    })
+                                color = MaterialTheme.colorScheme.outline,
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                     IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.Favorite, contentDescription = "",
@@ -197,10 +198,11 @@ fun MusicPlayerScreen(
             //progress bar
             Slider(
                 modifier = Modifier.fillMaxWidth(),
-                value = slider,
+                value = state.progress,
                 onValueChange = {
-                    slider = it
-                })
+                    event(MusicPlayerEvent.SeekTo(it))
+                },
+                valueRange = 0f..100f)
 
             //time
             Row(
@@ -208,8 +210,8 @@ fun MusicPlayerScreen(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = state.duration.toString(), fontWeight = FontWeight.Bold)
-                Text(text = "3:29", fontWeight = FontWeight.Bold)
+                Text(text = state.progressString, fontWeight = FontWeight.Bold)
+                Text(text = timeStampToDuration(state.duration), fontWeight = FontWeight.Bold)
 
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -241,8 +243,7 @@ fun MusicPlayerScreen(
                 ) {
                     IconButton(onClick = {
                         event(MusicPlayerEvent.PlayPause)
-                        onStart(1)
-                        
+                        onStart()
                     }) {
                         Icon(
                             modifier = Modifier.size(30.dp),
@@ -351,4 +352,11 @@ fun MusicPlayerScreen(
 
 
     }
+}
+private fun timeStampToDuration(position: Long): String{
+    val totalSecond = floor(position /1E3).toInt()
+    val minutes = totalSecond / 60
+    val remainingSeconds = totalSecond - (minutes * 60)
+    return if (position < 0) "--:--"
+    else "%d:%02d".format(minutes, remainingSeconds)
 }

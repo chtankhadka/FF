@@ -3,6 +3,7 @@ package com.chetan.ff.presentation.dashboard.library
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -235,8 +236,11 @@ fun LibraryScreen(
                                 )
                             }
                             Column(modifier = Modifier.fillMaxWidth()) {
+                                val shouldChange = state.isPlaying && state.currentSelectedAudio.id == audio.id
                                 Text(
+                                    modifier = if (shouldChange) Modifier.basicMarquee() else Modifier,
                                     text = audio.displayName,
+                                    color = if (shouldChange) MaterialTheme.colorScheme.secondary else Color.Black,
                                     style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,

@@ -20,6 +20,7 @@ import com.chetan.ff.presentation.comment.CommentScreen
 import com.chetan.ff.presentation.comment.CommentViewModel
 import com.chetan.ff.presentation.dashboard.DashboardScreen
 import com.chetan.ff.presentation.dashboard.DashboardViewModel
+import com.chetan.ff.presentation.dashboard.library.LibraryViewModel
 import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
 import com.chetan.ff.presentation.google_sign_in.SignInScreen
 import com.chetan.ff.presentation.google_sign_in.SignInViewModel

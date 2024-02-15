@@ -24,7 +24,6 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(
     private val audioServiceHandler: AudioServiceHandler,
     private val repository: AudioRepository,
-    private val preference: Preference,
     private val exoPlayer: ExoPlayer
 ) : ViewModel() {
     private val _state = MutableStateFlow(LibraryState())
@@ -35,8 +34,7 @@ class LibraryViewModel @Inject constructor(
         _state.update {
             it.copy(
                 audioIndex = exoPlayer.currentMediaItemIndex,
-
-            )
+                isPlaying = exoPlayer.isPlaying)
         }
 
     }
@@ -68,7 +66,8 @@ class LibraryViewModel @Inject constructor(
                     is AudioState.Playing -> {
                         _state.update {
                             it.copy(
-                                isPlaying = exoPlayer.isPlaying
+                                isPlaying = exoPlayer.isPlaying,
+                                currentSelectedAudio = _state.value.audioList[exoPlayer.currentMediaItemIndex]
                             )
                         }
                     }
@@ -181,7 +180,6 @@ class LibraryViewModel @Inject constructor(
                     audioServiceHandler.onPlayerEvents(
                         PlayerEvent.SelectedAudioChange, selectedAudioIndex = event.index
                     )
-                    preference.audioIndex = event.index
 
                 }
 
@@ -200,11 +198,5 @@ class LibraryViewModel @Inject constructor(
 
     }
 
-    override fun onCleared() {
-        viewModelScope.launch {
-            audioServiceHandler.onPlayerEvents(PlayerEvent.Stop)
-        }
-        super.onCleared()
-    }
 
 }
