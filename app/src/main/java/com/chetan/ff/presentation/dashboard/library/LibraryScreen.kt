@@ -2,6 +2,8 @@ package com.chetan.ff.presentation.dashboard.library
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.SkipNext
@@ -45,13 +48,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
@@ -62,7 +63,12 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LibraryScreen(navController: NavHostController) {
+fun LibraryScreen(
+    navController: NavHostController,
+    event: (event: LibraryEvent) -> Unit,
+    state: LibraryState,
+    onStart: () -> Unit
+) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf(
         Icons.Default.PlaylistPlay,
@@ -106,13 +112,18 @@ fun LibraryScreen(navController: NavHostController) {
                     }) {
                         Icon(imageVector = Icons.Default.OpenInNew, contentDescription = "Play")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        event(LibraryEvent.PlayPause)
+                        onStart()
+                    }) {
                         Icon(
-                            imageVector = Icons.Default.PlayCircleOutline,
+                            imageVector = if (state.isPlaying) Icons.Default.PauseCircleOutline else Icons.Default.PlayCircleOutline,
                             contentDescription = "Play"
                         )
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        event(LibraryEvent.SeekToNext)
+                    }) {
                         Icon(imageVector = Icons.Default.SkipNext, contentDescription = "Next")
                     }
                 }
@@ -195,49 +206,55 @@ fun LibraryScreen(navController: NavHostController) {
                         AlbumItem(position = page, pagerState = pagerState.currentPage)
                     }
                 }
-                val listEg = listOf(
-                    "https://m.media-amazon.com/images/I/61w8iMIL8YL._AC_UF894,1000_QL80_.jpg",
-                    "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Iron_Man_%28circa_2018%29.png/220px-Iron_Man_%28circa_2018%29.png",
-                    "https://upload.wikimedia.org/wikipedia/en/4/4a/Iron_Man_Mark_III_armor_from_Iron_Man_%282008_film%29.jpg",
-                    "https://static.independent.co.uk/s3fs-public/thumbnails/image/2008/04/30/21/26206.jpg"
-                )
-                listEg.forEach {
+                state.audioList.forEachIndexed { index, audio ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                event(LibraryEvent.SelectedAudioChange(index))
+                                if (!state.isPlaying){
+                                    onStart()
+                                }
+                            }
+                            .background(
+                                if (audio.id == state.currentSelectedAudio.id) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.Transparent
+                            ),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
+                            modifier = Modifier.weight(1f),
                             horizontalArrangement = Arrangement.spacedBy(15.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Card {
+                            Card(modifier = Modifier.size(65.dp)) {
                                 AsyncImage(
-                                    modifier = Modifier.size(65.dp),
-                                    model = it, contentDescription = "",
+                                    modifier = Modifier.fillMaxSize(),
+                                    model = audio.albumArtUri, contentDescription = "",
                                     contentScale = ContentScale.Crop
                                 )
                             }
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = audio.displayName,
+                                    style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                    )
-                                ) {
-                                    append("Hello good")
-                                }
-
-                                withStyle(
-                                    style = SpanStyle(
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = audio.artist,
+                                    style = TextStyle(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
-                                ) {
-                                    append("\nGood again bro")
-                                }
-                            })
+                                        color = MaterialTheme.colorScheme.outline,
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                         IconButton(onClick = { }) {
                             Icon(
@@ -245,9 +262,9 @@ fun LibraryScreen(navController: NavHostController) {
                                 tint = MaterialTheme.colorScheme.outline
                             )
                         }
-
-
                     }
+
+
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 

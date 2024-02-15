@@ -1,5 +1,6 @@
 package com.chetan.ff
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,8 +13,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.chetan.ff.presentation.dashboard.DashboardScreen
 import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
+import com.chetan.ff.service.AudioService
 import com.chetan.ff.ui.theme.FFTheme
 import com.chetan.orderdelivery.data.local.Preference
 import com.google.android.gms.auth.api.identity.Identity
@@ -24,11 +25,21 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var preference: Preference
+    var isServiceRunning = false
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
+    }
+    private fun startService(){
+        if (!isServiceRunning){
+            val intent = Intent(this,AudioService::class.java)
+            startForegroundService(intent)
+        }else{
+            startService(intent)
+        }
+        isServiceRunning = true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +65,15 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     AppNavHost(navController = navController,
                         onBack = {
-                            println("I am called")
                             finish()
+                        },
+                        audioService = {
+                            startService()
                         },
                         googleAuthUiClient,
                         lifecycleScope,
-                        applicationContext)
+                        applicationContext
+                        )
                 }
             }
         }

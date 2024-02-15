@@ -23,8 +23,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -56,10 +59,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.chetan.ff.data.local.model.Audio
 
 data class Message(val text: String, val isFlagged: Boolean)
 @Composable
-fun MusicPlayerScreen(nav: NavHostController) {
+fun MusicPlayerScreen(
+    nav: NavHostController,
+    onStart: (Int) -> Unit,
+    event: (event: MusicPlayerEvent) -> Unit,
+    state: MusicPlayerState
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,7 +88,6 @@ fun MusicPlayerScreen(nav: NavHostController) {
             mutableStateOf(
                 listOf(
                     Message("oe k suneko be???", false),
-                    Message("tero tauko suneko .. haha", true)
                 )
             )
         }
@@ -146,7 +154,7 @@ fun MusicPlayerScreen(nav: NavHostController) {
                     elevation = CardDefaults.cardElevation(20.dp)
                 ) {
                     AsyncImage(
-                        model = "https://pics.craiyon.com/2023-12-02/jDNJyPzdSMKQP2yHzfQ_VQ.webp",
+                        model = state.currentSelectedAudio.albumArtUri,
                         contentDescription = "",
                         contentScale = ContentScale.Crop
                     )
@@ -163,7 +171,7 @@ fun MusicPlayerScreen(nav: NavHostController) {
                                 fontWeight = FontWeight.Bold,
                             )
                         ) {
-                            append("Hello good")
+                            append(state.currentSelectedAudio.title)
                         }
 
                         withStyle(
@@ -173,7 +181,7 @@ fun MusicPlayerScreen(nav: NavHostController) {
                                 color = MaterialTheme.colorScheme.outline
                             )
                         ) {
-                            append("\nGood again bro")
+                            append("\n${state.currentSelectedAudio.artist}")
                         }
                     })
                     IconButton(onClick = { }) {
@@ -200,7 +208,7 @@ fun MusicPlayerScreen(nav: NavHostController) {
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "1:42", fontWeight = FontWeight.Bold)
+                Text(text = state.duration.toString(), fontWeight = FontWeight.Bold)
                 Text(text = "3:29", fontWeight = FontWeight.Bold)
 
             }
@@ -218,10 +226,12 @@ fun MusicPlayerScreen(nav: NavHostController) {
                         imageVector = Icons.Default.Repeat, contentDescription = ""
                     )
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    event(MusicPlayerEvent.SeekToBack)
+                }) {
                     Icon(
                         modifier = Modifier.size(30.dp),
-                        imageVector = Icons.Default.FastRewind,
+                        imageVector = Icons.Default.SkipPrevious,
                         contentDescription = ""
                     )
                 }
@@ -229,18 +239,24 @@ fun MusicPlayerScreen(nav: NavHostController) {
                     elevation = CardDefaults.cardElevation(10.dp),
                     colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)
                 ) {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        event(MusicPlayerEvent.PlayPause)
+                        onStart(1)
+                        
+                    }) {
                         Icon(
                             modifier = Modifier.size(30.dp),
-                            imageVector = Icons.Default.Pause, contentDescription = "Pause"
+                            imageVector = if(state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = "Pause"
                         )
                     }
                 }
 
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    event(MusicPlayerEvent.SeekToNext)
+                }) {
                     Icon(
                         modifier = Modifier.size(30.dp),
-                        imageVector = Icons.Default.FastForward, contentDescription = ""
+                        imageVector = Icons.Default.SkipNext, contentDescription = ""
                     )
                 }
                 IconButton(onClick = {

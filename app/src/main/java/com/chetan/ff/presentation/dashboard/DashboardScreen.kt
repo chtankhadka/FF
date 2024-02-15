@@ -81,6 +81,7 @@ import com.chetan.ff.R
 import com.chetan.ff.common.ApplicationAction
 import com.chetan.ff.presentation.dashboard.home.HomeScreen
 import com.chetan.ff.presentation.dashboard.home.HomeViewModel
+import com.chetan.ff.presentation.dashboard.library.LibraryViewModel
 import com.chetan.ff.presentation.dashboard.library.LibraryScreen
 import com.chetan.ff.presentation.dialogs.MessageDialog
 import com.chetan.ff.utils.BottomNavigate.bottomNavigate
@@ -101,6 +102,7 @@ fun DashboardScreen(
     nav: NavHostController,
     onBack: () -> Unit,
     state: DashboardState,
+    audioService: () -> Unit,
     onEvent: (event: DashboardEvent) -> Unit,
     onAction: (ApplicationAction) -> Unit
 ) {
@@ -352,10 +354,16 @@ fun DashboardScreen(
                             state = viewModel.state.collectAsStateWithLifecycle().value
                         )
                     }
+
                     composable("library") {
+                        val viewModel = hiltViewModel<LibraryViewModel>()
                         LibraryScreen(
-                            navController = nav
-                        )
+                            navController = nav,
+                            event = viewModel.onEvent,
+                            state = viewModel.state.collectAsStateWithLifecycle().value
+                        ) {
+                            audioService()
+                        }
                     }
                 }
                 if (hideOpenBar) {

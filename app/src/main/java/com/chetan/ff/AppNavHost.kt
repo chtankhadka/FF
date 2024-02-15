@@ -24,6 +24,7 @@ import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
 import com.chetan.ff.presentation.google_sign_in.SignInScreen
 import com.chetan.ff.presentation.google_sign_in.SignInViewModel
 import com.chetan.ff.presentation.musicplayer.MusicPlayerScreen
+import com.chetan.ff.presentation.musicplayer.MusicPlayerViewModel
 import com.chetan.ff.utils.CleanNavigate.cleanNavigate
 import kotlinx.coroutines.launch
 
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 fun AppNavHost(
     navController: NavHostController,
     onBack: () -> Unit,
+    audioService: () -> Unit,
     googleAuthUiClient: GoogleAuthUiClient,
     lifecycleScope: LifecycleCoroutineScope,
     applicationContext: Context
@@ -98,6 +100,9 @@ fun AppNavHost(
                nav = navController,
                onBack = onBack,
                state = state,
+               audioService = {
+                   audioService()
+               },
                onEvent = viewModel.onEvent,
                onAction = { applicationAction ->
                    when (applicationAction) {
@@ -133,8 +138,14 @@ fun AppNavHost(
        }
 
        composable(Destination.Screen.MusicPlayerDestination.route){
+           val viewModel = hiltViewModel<MusicPlayerViewModel>()
            MusicPlayerScreen(
-               nav = navController
+               nav = navController,
+               event = viewModel.onEvent,
+               state = viewModel.state.collectAsStateWithLifecycle().value,
+               onStart = {
+                   audioService()
+               }
            )
        }
    }

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "878485243437",
+    "firebase_url": "https://familesfriends-default-rtdb.firebaseio.com",
     "project_id": "familesfriends",
     "storage_bucket": "familesfriends.appspot.com"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.chetan.ff"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "878485243437-eujmeknc01c1pfve85123d936nr9tms9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chetan.ff",
+            "certificate_hash": "9ae3c7f391d799140b388b93ebd6c5b2c8182ed8"
+          }
+        },
+        {
+          "client_id": "878485243437-kqnraadkp3ftmsmrjqcbqu7bn2560hjb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chetan.ff",
+            "certificate_hash": "59450ebebcf0e6de0997d6d0785c1a63c4094f78"
+          }
+        },
+        {
+          "client_id": "878485243437-sosrp5ddnfube0n8s7dk3578ndj89sud.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyALyw4tmaz5WjembICjB1yHP-eYE94YrOA"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878485243437-sosrp5ddnfube0n8s7dk3578ndj89sud.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

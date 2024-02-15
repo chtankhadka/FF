@@ -4,6 +4,9 @@ package com.chetan.orderdelivery.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,6 +16,10 @@ class Preference @Inject constructor(
 ) {
     private val sharedPreference: SharedPreferences =
         context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+    private val _audioIndexFlow = MutableSharedFlow<Int>(replay = 1)
+
+    // Expose a read-only SharedFlow for external observation
+    val audioIndexFlow = _audioIndexFlow.asSharedFlow()
 
     companion object {
         private const val PREFERENCE_NAME = "PREFERENCE_NAME"
@@ -22,6 +29,8 @@ class Preference @Inject constructor(
         private const val GMAIL_PROFILE = "GMAIL_PROFILE"
         private const val NOTIFICATION = "NOTIFICATION"
         private const val GROUP_NAME = "GROUP_NAME"
+        private const val AUDIO_INDEX = "AUDIO_INDEX"
+        private const val IS_AUDIO_PLAYING = "IS_AUDIO_PLAYING"
     }
 
     var isDarkMode
@@ -47,5 +56,13 @@ class Preference @Inject constructor(
     var groupName
         get() = sharedPreference.getString(GROUP_NAME,"")
         set(value) {sharedPreference.edit().putString(GROUP_NAME,value).apply()}
+
+    var audioIndex : Int
+        get() = sharedPreference.getInt(AUDIO_INDEX, 0)
+        set(value) {sharedPreference.edit().putInt(AUDIO_INDEX, value).apply()
+            _audioIndexFlow.tryEmit(value)
+        }
+
+
 
 }
