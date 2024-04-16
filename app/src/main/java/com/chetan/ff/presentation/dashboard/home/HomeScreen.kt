@@ -469,7 +469,7 @@ fun WeatherItem(position: Int, pagerState: Int, info: List<UpdateStatusRequestRe
                         fontWeight = FontWeight.Bold,
                     )
                 ) {
-                    append(info[position].address + ",")
+                    append(info[position].ress + ",")
                 }
                 withStyle(
                     style = SpanStyle(

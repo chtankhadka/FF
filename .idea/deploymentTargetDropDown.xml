@@ -3,6 +3,25 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="app">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="VKCEIJYLM7Q4GASK" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-16T15:51:46.522510100Z" />
+        </State>
+      </entry>
+      <entry key="showAnimation">
+        <State />
+      </entry>
+      <entry key="tryThis">
         <State />
       </entry>
     </value>

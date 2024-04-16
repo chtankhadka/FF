@@ -75,7 +75,7 @@ class NotificationServiceExtension
                                     id = preference.tableName ?: "common",
                                     temperature = ((result.main?.temp ?: 273.15) - 273.15).toInt()
                                         .toString(),
-                                    address = if (result.name.length > 8) result.name.substring(
+                                    ress = if (result.name.length > 8) result.name.substring(
                                         0,
                                         7
                                     ) else result.name,

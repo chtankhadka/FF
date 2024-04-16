@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,9 +21,7 @@ import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.NotificationsActive
-import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.filled.RemoveRedEye
-import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -42,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.chetan.ff.presentation.animation.HoverAnimation
 
 @Composable
 fun AdminDashboardModalDrawerPage(
@@ -54,7 +52,8 @@ fun AdminDashboardModalDrawerPage(
     )
 
     val requestMenuItem = listOf(
-        MenuItem.RequestStatus
+        MenuItem.RequestStatus,
+        MenuItem.JoinGroup
     )
     Column(
         modifier = Modifier
@@ -110,30 +109,33 @@ fun AdminDashboardModalDrawerPage(
             }
         }
         Row(modifier = Modifier.weight(1f)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(horizontal = 5.dp)
-            ) {
-                requestMenuItem.forEach {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Card(
-                        modifier = Modifier.clickable {
-                            onClick(it)
-                        },
-                        elevation = CardDefaults.cardElevation(10.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .padding(4.dp),
-                            imageVector = it.icon,
-                            contentDescription = it.label,
-                        )
-                    }
-
-                }
-
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxHeight()
+//                    .padding(horizontal = 5.dp)
+//            ) {
+//                requestMenuItem.forEach {
+//                    Spacer(modifier = Modifier.height(5.dp))
+//                    Card(
+//                        modifier = Modifier.clickable {
+//                            onClick(it)
+//                        },
+//                        elevation = CardDefaults.cardElevation(10.dp)
+//                    ) {
+//                        Icon(
+//                            modifier = Modifier
+//                                .size(40.dp)
+//                                .padding(4.dp),
+//                            imageVector = it.icon,
+//                            contentDescription = it.label,
+//                        )
+//                    }
+//
+//                }
+//
+//            }
+            HoverAnimation(requestMenuItem) {
+                onClick(it)
             }
             LazyColumn(
                 modifier = Modifier
@@ -216,7 +218,9 @@ fun AdminDashboardModalDrawerPage(
 
 sealed class MenuItem(val icon: ImageVector, val label: String) {
     data object SendNotice : MenuItem(icon = Icons.Default.NotificationAdd, label = "Send Notice")
-    data object RequestStatus : MenuItem(icon = Icons.Default.RemoveRedEye, label = "Request Status")
+    data object RequestStatus :
+        MenuItem(icon = Icons.Default.RemoveRedEye, label = "Request Status")
+
     data object Logout : MenuItem(icon = Icons.Default.Logout, label = "LogOut")
     data object CreateGroup : MenuItem(icon = Icons.Default.Create, label = "Create Group")
     data object JoinGroup : MenuItem(icon = Icons.Default.Create, label = "Join Group")

@@ -59,7 +59,7 @@ class HomeViewModel @Inject constructor(
                         val updateWeather = firestoreUseCases.updateStatus(data = UpdateStatusRequestResponse(
                             id = preference.tableName?:"common",
                             temperature = ((result.main?.temp?:273.15) -  273.15).toInt().toString(),
-                            address = if (result.name.length> 8) result.name.substring(0,7) else result.name,
+                            ress = "nep",
                             country = result.sys.country,
                             date = result.dt.toString(),
                             weather = result.weather.first().main,
