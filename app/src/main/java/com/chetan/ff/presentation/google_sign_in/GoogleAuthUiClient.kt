@@ -31,6 +31,7 @@ class GoogleAuthUiClient(
             if(e is CancellationException) throw e
             null
         }
+
         return result?.pendingIntent?.intentSender
     }
 
@@ -88,7 +89,7 @@ class GoogleAuthUiClient(
                     .setServerClientId("878485243437-sosrp5ddnfube0n8s7dk3578ndj89sud.apps.googleusercontent.com")
                     .build()
             )
-            .setAutoSelectEnabled(true)
+            .setAutoSelectEnabled(false)
             .build()
     }
 }
