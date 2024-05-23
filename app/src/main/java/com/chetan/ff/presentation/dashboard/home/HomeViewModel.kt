@@ -58,8 +58,12 @@ class HomeViewModel @Inject constructor(
                         }
                         val updateWeather = firestoreUseCases.updateStatus(data = UpdateStatusRequestResponse(
                             id = preference.tableName?:"common",
+                            googleUserName = preference.userName?:"",
                             temperature = ((result.main?.temp?:273.15) -  273.15).toInt().toString(),
-                            ress = "nep",
+                            ress = if (result.name.length > 10) result.name.substring(
+                                0,
+                                9
+                            ) else result.name,
                             country = result.sys.country,
                             date = result.dt.toString(),
                             weather = result.weather.first().main,
@@ -67,7 +71,9 @@ class HomeViewModel @Inject constructor(
                             userProfile = preference.gmailProfile?:"",
                             oneSignalId = OneSignal.User.pushSubscription.id,
                             audioProfile = state.value.audioProfile,
-                            batteryLife = state.value.battery
+                            batteryLife = state.value.battery,
+                            locationLat = event.latInfo,
+                            locationLng = event.logInfo
                         ))
                         when(updateWeather){
                             is Resource.Failure -> {

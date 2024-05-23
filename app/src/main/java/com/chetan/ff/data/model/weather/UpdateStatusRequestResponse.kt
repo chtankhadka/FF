@@ -2,6 +2,7 @@ package com.chetan.ff.data.model.weather
 
 data class UpdateStatusRequestResponse(
     val id: String = "",
+    val googleUserName: String = "",
     val temperature : String = "",
     val ress: String = "",
     val country: String = "",
@@ -11,5 +12,7 @@ data class UpdateStatusRequestResponse(
     val userProfile: String = "",
     val oneSignalId: String = "",
     val audioProfile: String = "",
-    val batteryLife: String = ""
+    val batteryLife: String = "",
+    val locationLat: String = "",
+    val locationLng: String = "",
 )

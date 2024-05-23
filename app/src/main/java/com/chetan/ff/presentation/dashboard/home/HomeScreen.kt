@@ -465,7 +465,7 @@ fun WeatherItem(position: Int, pagerState: Int, info: List<UpdateStatusRequestRe
             Text(text = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
-                        fontSize = 30.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                     )
                 ) {
@@ -473,7 +473,7 @@ fun WeatherItem(position: Int, pagerState: Int, info: List<UpdateStatusRequestRe
                 }
                 withStyle(
                     style = SpanStyle(
-                        fontSize = 32.sp, fontWeight = FontWeight(1000)
+                        fontSize = 30.sp, fontWeight = FontWeight(1000)
                     )
                 ) {
                     append(info[position].country)

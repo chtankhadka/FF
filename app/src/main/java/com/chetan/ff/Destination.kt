@@ -4,6 +4,7 @@ open class Destination(open val route: String) {
     object Screen{
 
         object DashboardDestination : Destination("dashboard-screen")
+        object OurLocations: Destination("our-locations-screen")
 
         object SignInDestination : Destination("sign-in-screen")
 

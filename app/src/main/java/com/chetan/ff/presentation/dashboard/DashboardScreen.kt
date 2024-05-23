@@ -77,6 +77,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.chetan.ff.Destination
 import com.chetan.ff.R
 import com.chetan.ff.common.ApplicationAction
 import com.chetan.ff.presentation.dashboard.home.HomeScreen
@@ -243,6 +244,10 @@ fun DashboardScreen(
                         MenuItem.RequestStatus -> {
                             onEvent(DashboardEvent.GetStatusNow)
                             Toast.makeText(context,"Getting Status",Toast.LENGTH_SHORT).show()
+                        }
+
+                        MenuItem.OurLocations -> {
+                            nav.navigate(Destination.Screen.OurLocations.route)
                         }
                     }
                 },

@@ -20,12 +20,13 @@ import com.chetan.ff.presentation.comment.CommentScreen
 import com.chetan.ff.presentation.comment.CommentViewModel
 import com.chetan.ff.presentation.dashboard.DashboardScreen
 import com.chetan.ff.presentation.dashboard.DashboardViewModel
-import com.chetan.ff.presentation.dashboard.library.LibraryViewModel
 import com.chetan.ff.presentation.google_sign_in.GoogleAuthUiClient
 import com.chetan.ff.presentation.google_sign_in.SignInScreen
 import com.chetan.ff.presentation.google_sign_in.SignInViewModel
 import com.chetan.ff.presentation.musicplayer.MusicPlayerScreen
 import com.chetan.ff.presentation.musicplayer.MusicPlayerViewModel
+import com.chetan.ff.presentation.ourlocations.OurLocationsScreen
+import com.chetan.ff.presentation.ourlocations.OurLocationsViewModel
 import com.chetan.ff.utils.CleanNavigate.cleanNavigate
 import kotlinx.coroutines.launch
 
@@ -138,6 +139,13 @@ fun AppNavHost(
            )
        }
 
+       composable(Destination.Screen.OurLocations.route){
+           val viewModel = hiltViewModel<OurLocationsViewModel>()
+           OurLocationsScreen(
+               nav = navController,
+               state = viewModel.state.collectAsStateWithLifecycle().value,
+           )
+       }
        composable(Destination.Screen.MusicPlayerDestination.route){
            val viewModel = hiltViewModel<MusicPlayerViewModel>()
            MusicPlayerScreen(

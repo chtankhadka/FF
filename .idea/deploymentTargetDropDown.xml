@@ -3,29 +3,26 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="showAnimation">
+        <State />
+      </entry>
+      <entry key="sow">
         <State>
           <runningDeviceTargetSelectedWithDropDown>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="VKCEIJYLM7Q4GASK" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\chtan\.android\avd\Nexus_6P_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-16T15:51:46.522510100Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-18T18:52:06.541337700Z" />
         </State>
-      </entry>
-      <entry key="showAnimation">
-        <State />
-      </entry>
-      <entry key="tryThis">
-        <State />
-      </entry>
-      <entry key="showAnimation">
-        <State />
       </entry>
       <entry key="tryThis">
         <State />
